@@ -1,0 +1,5 @@
+*.classpath
+*.prefs
+*.class
+*.jar
+trading/target/maven-archiver/pom.properties
