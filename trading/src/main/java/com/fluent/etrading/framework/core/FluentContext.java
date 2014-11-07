@@ -1,14 +1,34 @@
 package com.fluent.etrading.framework.core;
 
-import java.lang.management.*;
 import java.util.concurrent.atomic.*;
 
 import static com.fluent.etrading.framework.core.FluentLocale.*;
-import static com.fluent.etrading.framework.core.FluentLocale.State.*;
-import static com.fluent.etrading.framework.utility.ContainerUtil.*;
+import static com.fluent.etrading.framework.core.FluentContext.State.*;
 
 
 public final class FluentContext{
+	
+	
+	public enum State{
+		
+		INITIALIZING 	("Initializing"),
+		RECOVERY		("Recovering"),
+		PAUSED			("Paused"),
+		CANCEL_ONLY		("Cancel Only"),
+		RUNNING			("Running");
+		
+		private final String description;
+		
+		private State( String description ){
+			this.description = description;
+		}
+		
+		public final String getDescription( ){
+			return description;
+		}
+		
+	}
+	
 
 	private final static AtomicReference<State> STATE;
 		
@@ -37,36 +57,5 @@ public final class FluentContext{
 	}
 	
 	
-	public static final Region getRegion( ){
-        return Region.getRegion();
-    }
-
-	
-	public static final Environment getEnvironment( ){
-        return Environment.getEnvironment();
-    }
-
-	
-	public static final Instance getInstance( ){
-        return Instance.getInstance();
-    }
-
-    
-	public static final String getContainerInfo( ){
-
-        StringBuilder builder  = new StringBuilder( TWO * SIXTY_FOUR );
-        String processName     = ManagementFactory.getRuntimeMXBean().getName();
-
-        builder.append( L_BRACKET );
-        builder.append( "Instance:" ).append( getInstance() );
-        builder.append( ", Environment:" ).append( getEnvironment() );
-        builder.append( ", Region:" ).append( getRegion() );
-        builder.append( ", State:" ).append( getState() );
-        builder.append( ", Process:" ).append( processName );
-        builder.append( R_BRACKET );
-
-        return builder.toString();
-
-    }
 
 }

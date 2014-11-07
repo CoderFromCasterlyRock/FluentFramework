@@ -3,7 +3,6 @@ package com.fluent.etrading.framework.elasticsearch;
 import org.slf4j.*;
 
 import com.fluent.etrading.framework.core.*;
-import com.fluent.etrading.framework.utility.ContainerUtil;
 
 import org.elasticsearch.action.admin.indices.create.*;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
@@ -17,6 +16,7 @@ import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
+import static com.fluent.etrading.framework.collections.FluentWatch.*;
 
 
 //TODO
@@ -180,7 +180,7 @@ public class AbstractESClient implements FluentService{
     
     
     protected final static String getDefaultIndexName(){
-    	return DEFAULT_INDEX_PREFIX + ContainerUtil.TODAY_FORMATTED;
+    	return DEFAULT_INDEX_PREFIX + TODAY_FORMATTED;
     }
     
     

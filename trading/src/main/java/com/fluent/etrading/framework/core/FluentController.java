@@ -4,14 +4,15 @@ import org.slf4j.*;
 
 import java.util.concurrent.*;
 
+import com.fluent.etrading.framework.collections.FluentWatch;
 import com.fluent.etrading.framework.dispatcher.core.BackoffStrategy;
 import com.fluent.etrading.framework.dispatcher.core.ParkingBackoffStrategy;
 import com.fluent.etrading.framework.dispatcher.in.InputEventDispatcher;
 import com.fluent.etrading.framework.dispatcher.out.OutputEventDispatcher;
 
 import static java.util.concurrent.TimeUnit.*;
-import static com.fluent.etrading.framework.core.FluentLocale.State.*;
 import static com.fluent.etrading.framework.utility.ContainerUtil.*;
+import static com.fluent.etrading.framework.core.FluentContext.State.*;
 
 
 public final class FluentController implements FluentService{
@@ -39,10 +40,12 @@ public final class FluentController implements FluentService{
 		this.LOCK	= new Object();
 	}
 
+	
 	@Override
 	public final String name( ){
 		return NAME;
 	}
+	
 	
 	@Override
 	public final void init( ){
@@ -59,9 +62,9 @@ public final class FluentController implements FluentService{
 		
 				BackoffStrategy bOff	= new ParkingBackoffStrategy( ONE, SECONDS );
 				long sleepDuration		= MILLISECONDS.convert( time, unit );
-				long startTime 		 	= System.currentTimeMillis();
+				long startTime 		 	= FluentWatch.nowMillis();
 					
-				while( (System.currentTimeMillis() - startTime ) < sleepDuration ){
+				while( (FluentWatch.nowMillis() - startTime ) < sleepDuration ){
 					bOff.apply();
 				}
 			

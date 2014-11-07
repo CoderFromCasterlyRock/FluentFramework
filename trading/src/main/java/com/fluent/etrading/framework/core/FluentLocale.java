@@ -55,6 +55,7 @@ public final class FluentLocale{
 
     }
 
+    
     public enum Instance{
         
     	FLUENT_OUTRIGHT,
@@ -77,28 +78,39 @@ public final class FluentLocale{
         }
 
     }
-    
-    
-	public enum State{
-		
-		INITIALIZING 	("Initializing"),
-		RECOVERY		("Recovering"),
-		PAUSED			("Paused"),
-		CANCEL_ONLY		("Cancel Only"),
-		RUNNING			("Running");
-		
-		private final String description;
-		
-		private State( String description ){
-			this.description = description;
-		}
-		
-		public final String getDescription( ){
-			return description;
-		}
-		
-	}
+
+	
+	public static final Region getRegion( ){
+        return Region.getRegion();
+    }
+
+	
+	public static final Environment getEnvironment( ){
+        return Environment.getEnvironment();
+    }
+
+	
+	public static final Instance getInstance( ){
+        return Instance.getInstance();
+    }
+
 	  
+	public static final String getContainerInfo( ){
+
+        StringBuilder builder  = new StringBuilder( TWO * SIXTY_FOUR );
+        
+        builder.append( L_BRACKET );
+        builder.append( "Environment:" ).append( getEnvironment() );
+        builder.append( ", Region:" ).append( getRegion() );
+        builder.append( ", Instance:" ).append( getInstance() );
+        builder.append( ", State:" ).append( FluentContext.getState() );
+        builder.append( ", Process:" ).append( getFullProcessName() );
+        builder.append( R_BRACKET );
+
+        return builder.toString();
+
+    }
+	
 
     private static void printUsageAndExit( String propName, String propValue, String choices ){
 

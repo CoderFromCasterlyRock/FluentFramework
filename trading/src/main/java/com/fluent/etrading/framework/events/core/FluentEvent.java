@@ -1,9 +1,10 @@
 package com.fluent.etrading.framework.events.core;
 
 import com.eclipsesource.json.*;
+import com.fluent.etrading.framework.collections.*;
 
+import static com.fluent.etrading.framework.collections.FluentWatch.*;
 import static com.fluent.etrading.framework.events.core.FluentJsonTags.*;
-import static com.fluent.etrading.framework.utility.ContainerUtil.*;
 
 
 public abstract class FluentEvent{
@@ -15,7 +16,7 @@ public abstract class FluentEvent{
     protected FluentEvent( boolean isValid, long eventId ){
         this.eventId		= eventId;
         this.isValid    	= isValid;
-        this.timeCreated	= System.currentTimeMillis();
+        this.timeCreated	= FluentWatch.nowMillis();
     }
 
     public abstract FluentEventType getType();

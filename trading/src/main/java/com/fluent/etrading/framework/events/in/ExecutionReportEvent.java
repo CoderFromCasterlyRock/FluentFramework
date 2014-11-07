@@ -1,6 +1,7 @@
 package com.fluent.etrading.framework.events.in;
 
 import com.eclipsesource.json.*;
+import com.fluent.etrading.framework.collections.FluentWatch;
 import com.fluent.etrading.framework.events.core.*;
 import com.fluent.etrading.framework.market.core.*;
 import com.fluent.etrading.framework.order.*;
@@ -31,7 +32,7 @@ public final class ExecutionReportEvent extends FluentInputEvent{
     public ExecutionReportEvent( long strategyId, long orderId, OrderFillStatus oStatus, String reason,
                                  OrderType oType, Side side, MarketType mType, String instrumentId ){
 
-        this( false, strategyId, orderId, NEGATIVE_ONE, System.currentTimeMillis(), oStatus, true, reason, oType, side, mType, instrumentId, ZERO_DOUBLE, ZERO_DOUBLE );
+        this( false, strategyId, orderId, NEGATIVE_ONE, FluentWatch.nowMillis(), oStatus, true, reason, oType, side, mType, instrumentId, ZERO_DOUBLE, ZERO_DOUBLE );
 
     }
 

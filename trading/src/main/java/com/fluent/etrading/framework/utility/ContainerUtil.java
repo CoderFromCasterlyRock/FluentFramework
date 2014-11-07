@@ -1,8 +1,6 @@
 package com.fluent.etrading.framework.utility;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
+import java.lang.management.*;
 
 
 public final class ContainerUtil{
@@ -45,14 +43,9 @@ public final class ContainerUtil{
     public static final String R_BRACKET        = "]";
     public static final String SEMICOLON        = ".";
     public static final String UNDERSCORE       = "_";
-    public static final String DATE_FORMAT      = "yyyy-MM-dd";
     public static final String ES_DATE_FORMAT   = "hour_minute_second_millis";
         
-    public static final String TODAY_FORMATTED	=  getFormattedDate( DATE_FORMAT );
-    
-    public static final long TIME_OFFSET_MS		= TimeZone.getDefault().getOffset(System.currentTimeMillis());
-
-    
+        
     protected ContainerUtil(){}
 
 
@@ -77,37 +70,20 @@ public final class ContainerUtil{
     }
     
     
-    protected final static String getFormattedDate( String dateFormat ){
-    	SimpleDateFormat format = new SimpleDateFormat( dateFormat );
-    	return format.format( new Date() );
-    }
-    
-    
-    public final static String formatTime( long timestampInMillis ){
-    	
-    	StringBuilder timestamp = new StringBuilder( TWENTY_FOUR );
-    	timestampInMillis	= timestampInMillis + TIME_OFFSET_MS;
-    	
-    	int ms = (int) ( timestampInMillis % SIXTY );
-    	int ss = (int) ( timestampInMillis/THOUSAND) % SIXTY;
-    	int mi = (int) ((timestampInMillis/(THOUSAND*SIXTY)) % SIXTY);
-    	int hr = (int) ((timestampInMillis/(THOUSAND*SIXTY*SIXTY))% TWENTY_FOUR);
-    	
-    	timestamp.append(hr).append(COLON).append(mi).append(COLON).append(ss).append(DOT).append(ms);
-    	
-    	return timestamp.toString();
-    	
-    }
-    
-    
     public final static int parseInteger( String value ){
 		return isBlank(value) ? 0 : Integer.parseInt(value);
     }
 	
+    
     public final static double parseDouble( String value ){
 		return isBlank(value) ? 0.0 : Double.parseDouble(value);
     }
     
-	
+    
+    public final static String getFullProcessName(){
+    	return ManagementFactory.getRuntimeMXBean().getName();
+    }
+    
+    
 }
 
