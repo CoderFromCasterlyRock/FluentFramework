@@ -15,7 +15,7 @@ public final class FluentLocale{
         public static Region getRegion( ){
             String name     = EMPTY;
             Region region   = null;
-            String prop     = "smart.container.region";
+            String prop     = "fluent.framework.region";
 
             try{
                 name    = System.getProperty( prop );
@@ -40,7 +40,7 @@ public final class FluentLocale{
         public static Environment getEnvironment( ){
             String name         = EMPTY;
             Environment env     = null;
-            String prop         = "smart.container.environment";
+            String prop         = "fluent.framework.environment";
 
             try{
                 name    = System.getProperty( prop );
@@ -56,13 +56,14 @@ public final class FluentLocale{
     }
 
     public enum Instance{
-        SMART_OUTRIGHT,
-        SMART_STRATEGY;
+        
+    	FLUENT_OUTRIGHT,
+        FLUENT_STRATEGY;
 
         public static Instance getInstance( ){
             String name         = EMPTY;
             Instance instance   = null;
-            String prop         = "smart.container.instance";
+            String prop         = "fluent.framework.instance";
 
             try{
                 name        = System.getProperty( prop );
@@ -102,7 +103,7 @@ public final class FluentLocale{
     private static void printUsageAndExit( String propName, String propValue, String choices ){
 
         StringBuilder usage = new StringBuilder( TWO * SIXTY_FOUR );
-        usage.append( "[ERROR while starting Smart Container]" );
+        usage.append( "[ERROR while starting Fluent Framework]" );
         usage.append( NEWLINE );
         usage.append( propName ).append( COLON ).append( propValue ).append(" is NOT valid!");
         usage.append( NEWLINE );
