@@ -5,7 +5,6 @@ import org.slf4j.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-import com.fluent.etrading.framework.collections.*;
 import com.fluent.etrading.framework.core.*;
 import com.fluent.etrading.framework.dispatcher.core.*;
 import com.fluent.etrading.framework.events.core.*;
@@ -20,7 +19,7 @@ public final class BlockingInputEventDispatcher extends InputEventDispatcher imp
     private volatile boolean keepDispatching;
 
     private final ExecutorService executor;
-    private final FluentQueue<FluentInputEvent> queue;
+    private final BlockingQueue<FluentInputEvent> queue;
 
     private final static String NAME        = FluentInputEventDispatcher.class.getSimpleName();
     private final static Logger LOGGER      = LoggerFactory.getLogger( NAME );
@@ -35,10 +34,10 @@ public final class BlockingInputEventDispatcher extends InputEventDispatcher imp
     }
         
     public BlockingInputEventDispatcher( BackoffStrategy backoff, FluentPersister<FluentInputEvent> persister, Set<FluentInputEventType> recoverables ){
-        this( backoff, persister, recoverables, new FluentBlockingQueue<FluentInputEvent>( FOUR * SIXTY_FOUR * SIXTY_FOUR ) );
+        this( backoff, persister, recoverables, new ArrayBlockingQueue<FluentInputEvent>( FOUR * SIXTY_FOUR * SIXTY_FOUR ) );
     }
 
-    public BlockingInputEventDispatcher( BackoffStrategy backoff, FluentPersister<FluentInputEvent> persister, Set<FluentInputEventType> recoverables, FluentBlockingQueue<FluentInputEvent> queue ){
+    public BlockingInputEventDispatcher( BackoffStrategy backoff, FluentPersister<FluentInputEvent> persister, Set<FluentInputEventType> recoverables, ArrayBlockingQueue<FluentInputEvent> queue ){
         super( backoff, persister, recoverables );
 
         this.queue      = queue;
@@ -99,53 +98,38 @@ public final class BlockingInputEventDispatcher extends InputEventDispatcher imp
         Collection<FluentInputEvent> bucket = new ArrayList<FluentInputEvent>( SIXTY_FOUR );
 
         while( keepDispatching ){
-            dispatch( bucket );
-        }
+           
+        	try{
 
-    }
+        		int countPolled         = queue.drainTo( bucket );
+        		boolean nothingPolled   = ( countPolled == ZERO );
+        		if( nothingPolled ){
+        			getBackoff().apply( );
+        			continue;
+        		}
 
+        		for( FluentInputEvent event : bucket ){
 
-    protected final int dispatch( final Collection<FluentInputEvent> bucket ){
-
-        int dispatchedCount         = ZERO;
-
-        try{
-
-            int countPolled         = queue.drainTo( bucket );
-            boolean nothingPolled   = ( countPolled == ZERO );
-            if( nothingPolled ){
-                getBackoff().apply( );
-                return NEGATIVE_ONE;
-            }
-
-            
-            for( FluentInputEvent event : bucket ){
-
-                for( FluentInputEventListener listener : getListeners() ){
-                    if( listener.isSupported(event.getType()) ){
-                        listener.update(  event );
-                        ++dispatchedCount;
-                    }
-                }
+        			for( FluentInputEventListener listener : getListeners() ){
+        				if( listener.isSupported(event.getType()) ){
+        					listener.update(  event );
+        				}
+        			}
                 
-              //  getPersister().persist( event );
+        			//  getPersister().persist( event );
 
-            }
+        		}
 
-            if( dispatchedCount == ZERO ){
-                LOGGER.warn( "DEAD EVENT! Valid input events arrived but no listeners are registered!" );
-            }
-            
-
-        }catch( Exception e ){
-            LOGGER.error("FAILED to dispatch input events.");
-            LOGGER.error("Exception:", e);
-
-        }finally{
-            bucket.clear();
+        		if( countPolled > ZERO ){
+        			bucket.clear();	
+        		}
+        		
+        	}catch( Exception e ){
+        		LOGGER.error("FAILED to dispatch input events.");
+        		LOGGER.error("Exception:", e);
+        	}
+        	
         }
-
-        return dispatchedCount;
 
     }
 

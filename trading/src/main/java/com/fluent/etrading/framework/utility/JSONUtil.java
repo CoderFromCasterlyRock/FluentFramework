@@ -68,13 +68,13 @@ public final class JSONUtil{
 
 
 
-    public final static MarketType[] convertToMarketArray( JsonArray array ){
+    public final static Marketplace[] convertToMarketArray( JsonArray array ){
         int size            = array.size();
-        MarketType[] market = new MarketType[size];
+        Marketplace[] market = new Marketplace[size];
 
         for( int i=ZERO; i< size; i++ ){
             JsonValue value = array.get( i );
-            market[i]       = MarketType.valueOf(value.asString());
+            market[i]       = Marketplace.valueOf(value.asString());
         }
 
         return market;
@@ -108,9 +108,9 @@ public final class JSONUtil{
 
 
 
-    public final static JsonArray convertFromMarketArray( MarketType[] array ){
+    public final static JsonArray convertFromMarketArray( Marketplace[] array ){
         JsonArray jArray   = new JsonArray(  );
-        for( MarketType m : array ){
+        for( Marketplace m : array ){
             jArray.add( m.name() );
         }
         return jArray;

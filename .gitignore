@@ -3,3 +3,4 @@
 *.class
 *.jar
 trading/target/maven-archiver/pom.properties
+*.xml

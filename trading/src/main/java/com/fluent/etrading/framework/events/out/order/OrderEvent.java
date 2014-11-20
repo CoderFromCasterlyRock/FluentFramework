@@ -2,7 +2,7 @@ package com.fluent.etrading.framework.events.out.order;
 
 import com.fluent.etrading.framework.events.core.FluentOutputEvent;
 import com.fluent.etrading.framework.events.core.FluentOutputEventType;
-import com.fluent.etrading.framework.market.core.MarketType;
+import com.fluent.etrading.framework.market.core.Marketplace;
 import com.fluent.etrading.framework.order.OrderType;
 import com.fluent.etrading.framework.order.Side;
 
@@ -13,7 +13,7 @@ public abstract class OrderEvent extends FluentOutputEvent{
     private final long mdUpdateId;
     private final String instrumentId;
     private final OrderType orderType;
-    private final MarketType marketType;
+    private final Marketplace marketType;
 
     private final Side side;
     private final double price;
@@ -22,7 +22,7 @@ public abstract class OrderEvent extends FluentOutputEvent{
 
 
     public OrderEvent( long strategyId, long orderId, long mdUpdateId, FluentOutputEventType type,
-                       MarketType marketType, OrderType orderType,
+                       Marketplace marketType, OrderType orderType,
                        Side side, String instrumentId, double price, int sendQuantity, String traderId ){
 
         super( orderId, type );
@@ -60,7 +60,7 @@ public abstract class OrderEvent extends FluentOutputEvent{
         return orderType;
     }
 
-    public final MarketType getMarketType( ){
+    public final Marketplace getMarketType( ){
         return marketType;
     }
 

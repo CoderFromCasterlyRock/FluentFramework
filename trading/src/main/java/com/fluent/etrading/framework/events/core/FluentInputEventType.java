@@ -19,10 +19,9 @@ public enum FluentInputEventType implements FluentEventType{
     CANCEL_ALL_STRATEGY                 ( TRADER_CATEGORY,      "Cancel all strategies owned by this trader." ),
 
     //Market Data Generated Events
-    EQUITY_MD                         	( MARKET_CATEGORY,      "Equity market data outgoing." ),
-    TREASURY_MD                         ( MARKET_CATEGORY,      "Treasury market data outgoing." ),
-    T_FUTURES_MD                        ( MARKET_CATEGORY,      "Treasury market data outgoing." ),
-    ED_FUTURES_MD                       ( MARKET_CATEGORY,      "Treasury market data outgoing." ),
+    TREASURY_MD                         ( MARKET_CATEGORY,      "Treasury market data." ),
+    FUTURES_MD                 		    ( MARKET_CATEGORY,      "Futures market data." ),
+    SWAPS_MD                 		    ( MARKET_CATEGORY,      "IR Swaps market data." ),
 
     //Execution Generated Events
     EXECUTION_REPORT_UPDATE             ( EXECUTION_CATEGORY,   "Execution report outgoing" ),

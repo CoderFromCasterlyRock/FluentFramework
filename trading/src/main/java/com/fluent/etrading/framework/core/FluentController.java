@@ -1,12 +1,9 @@
 package com.fluent.etrading.framework.core;
 
 import org.slf4j.*;
-
 import java.util.concurrent.*;
 
-import com.fluent.etrading.framework.collections.FluentWatch;
 import com.fluent.etrading.framework.dispatcher.core.BackoffStrategy;
-import com.fluent.etrading.framework.dispatcher.core.ParkingBackoffStrategy;
 import com.fluent.etrading.framework.dispatcher.in.InputEventDispatcher;
 import com.fluent.etrading.framework.dispatcher.out.OutputEventDispatcher;
 
@@ -19,7 +16,7 @@ public final class FluentController implements FluentService{
 	
 	private final long time;
 	private final TimeUnit unit;
-	private final Object LOCK;
+	private final Object lock;
 	private final InputEventDispatcher input;
 	private final OutputEventDispatcher output;
 		
@@ -37,7 +34,7 @@ public final class FluentController implements FluentService{
 		this.unit	= unit;
 		this.input	= input;
 		this.output	= output;
-		this.LOCK	= new Object();
+		this.lock	= new Object();
 	}
 
 	
@@ -52,7 +49,7 @@ public final class FluentController implements FluentService{
 				
 		try{
 		
-			synchronized( LOCK ){
+			synchronized( lock ){
 			
 				FluentContext.setState( RECOVERY );
 				LOGGER.debug("Starting Event Controller, container is in [{}] state. Dispatches will be given [{}] [{}] for recovery.", FluentContext.getState(), time, unit );
@@ -60,11 +57,11 @@ public final class FluentController implements FluentService{
 				input.startDispatch();
 				output.startDispatch();
 		
-				BackoffStrategy bOff	= new ParkingBackoffStrategy( ONE, SECONDS );
+				BackoffStrategy bOff	= new BackoffStrategy( ONE, SECONDS );
 				long sleepDuration		= MILLISECONDS.convert( time, unit );
-				long startTime 		 	= FluentWatch.nowMillis();
+				long startTime 		 	= nowMillis();
 					
-				while( (FluentWatch.nowMillis() - startTime ) < sleepDuration ){
+				while( (nowMillis() - startTime ) < sleepDuration ){
 					bOff.apply();
 				}
 			
@@ -85,7 +82,7 @@ public final class FluentController implements FluentService{
 	public void stop( ){
 		
 		try{
-			synchronized( LOCK ){
+			synchronized( lock ){
 				input.stopDispatch( );
 				output.stopDispatch( );
 				LOGGER.debug("Successfully stopped {}.", NAME);

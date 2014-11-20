@@ -9,7 +9,7 @@ import com.fluent.etrading.framework.events.in.ExecutionReportEvent;
 import com.fluent.etrading.framework.events.in.LoopbackEvent;
 import com.fluent.etrading.framework.events.in.LoopbackEventProvider;
 import com.fluent.etrading.framework.events.out.order.OrderEvent;
-import com.fluent.etrading.framework.market.core.MarketType;
+import com.fluent.etrading.framework.market.core.Marketplace;
 import com.fluent.etrading.framework.market.parameters.MarketParameter;
 import com.fluent.etrading.framework.order.OrderFillStatus;
 
@@ -37,7 +37,7 @@ public abstract class OrderExecutor<R, O extends OrderEvent> implements FluentSe
     }
 
 
-    public final MarketType getMarketType( ){
+    public final Marketplace getMarketType( ){
         return marketAdaptor.getMarketType();
     }
 

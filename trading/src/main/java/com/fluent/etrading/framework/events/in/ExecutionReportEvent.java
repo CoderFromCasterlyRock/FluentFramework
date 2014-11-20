@@ -1,15 +1,16 @@
 package com.fluent.etrading.framework.events.in;
 
 import com.eclipsesource.json.*;
-import com.fluent.etrading.framework.collections.FluentWatch;
+
+import com.fluent.etrading.framework.order.*;
 import com.fluent.etrading.framework.events.core.*;
 import com.fluent.etrading.framework.market.core.*;
-import com.fluent.etrading.framework.order.*;
 
-import static com.fluent.etrading.framework.events.core.FluentInputEventType.*;
-import static com.fluent.etrading.framework.events.core.FluentJsonTags.*;
-import static com.fluent.etrading.framework.utility.ContainerUtil.*;
 import static com.fluent.etrading.framework.utility.JSONUtil.*;
+import static com.fluent.etrading.framework.utility.ContainerUtil.*;
+import static com.fluent.etrading.framework.events.core.FluentJsonTags.*;
+import static com.fluent.etrading.framework.events.core.FluentInputEventType.*;
+
 
 public final class ExecutionReportEvent extends FluentInputEvent{
 
@@ -21,7 +22,7 @@ public final class ExecutionReportEvent extends FluentInputEvent{
     private final OrderFillStatus fillStatus;
 
     private final Side side;
-    private final MarketType marketType;
+    private final Marketplace marketType;
     private final OrderType orderType;
     private final String instrumentId;
     private final double executionPrice;
@@ -30,16 +31,16 @@ public final class ExecutionReportEvent extends FluentInputEvent{
     
 
     public ExecutionReportEvent( long strategyId, long orderId, OrderFillStatus oStatus, String reason,
-                                 OrderType oType, Side side, MarketType mType, String instrumentId ){
+                                 OrderType oType, Side side, Marketplace mType, String instrumentId ){
 
-        this( false, strategyId, orderId, NEGATIVE_ONE, FluentWatch.nowMillis(), oStatus, true, reason, oType, side, mType, instrumentId, ZERO_DOUBLE, ZERO_DOUBLE );
+        this( false, strategyId, orderId, NEGATIVE_ONE, nowMillis(), oStatus, true, reason, oType, side, mType, instrumentId, ZERO_DOUBLE, ZERO_DOUBLE );
 
     }
 
 
     public ExecutionReportEvent( boolean isValid, long strategyId, long orderId, long externalId,
                                  long executionTime, OrderFillStatus fillStatus, boolean isRejected, String rejectionReason,
-                                 OrderType orderType, Side side, MarketType marketType,
+                                 OrderType orderType, Side side, Marketplace marketType,
                                  String instrumentId, double executionPrice, double executionQuantity ){
 
         super( isValid, orderId, EXECUTION_REPORT_UPDATE );
@@ -92,7 +93,7 @@ public final class ExecutionReportEvent extends FluentInputEvent{
         return side;
     }
 
-    public final MarketType getMarketType( ){
+    public final Marketplace getMarketType( ){
         return marketType;
     }
     
@@ -146,7 +147,7 @@ public final class ExecutionReportEvent extends FluentInputEvent{
                                         valueAsString( REJECTED_REASON, object ),
                                         OrderType.valueOf( valueAsString( ORDER_TYPE, object ) ),
                                         Side.valueOf( valueAsString( SIDE, object ) ),
-                                        MarketType.valueOf( valueAsString( MARKET, object ) ),
+                                        Marketplace.valueOf( valueAsString( MARKET, object ) ),
                                         valueAsString( INSTRUMENT_NAME, object ),
                                         valueAsDouble( EXECUTION_PRICE, object ),
                                         valueAsDouble( EXECUTION_QUANTITY, object ) );

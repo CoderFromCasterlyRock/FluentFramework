@@ -16,7 +16,8 @@ import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
-import static com.fluent.etrading.framework.collections.FluentWatch.*;
+import static com.fluent.etrading.framework.utility.ContainerUtil.*;
+
 
 
 //TODO

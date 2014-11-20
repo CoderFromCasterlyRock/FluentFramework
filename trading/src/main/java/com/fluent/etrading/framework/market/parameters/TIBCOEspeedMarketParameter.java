@@ -3,14 +3,14 @@ package com.fluent.etrading.framework.market.parameters;
 import java.util.*;
 
 import com.fluent.etrading.framework.events.out.order.OrderEvent;
-import com.fluent.etrading.framework.market.core.MarketType;
+import com.fluent.etrading.framework.market.core.Marketplace;
 
 
 public class TIBCOEspeedMarketParameter extends TIBCOMarketParameter{
 
 
     public TIBCOEspeedMarketParameter(){
-        super( MarketType.ESPEED );
+        super( Marketplace.ESPEED );
     }
 
 

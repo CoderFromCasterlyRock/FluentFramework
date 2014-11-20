@@ -41,12 +41,8 @@ public final class FluentInputEventDispatcher extends InputEventDispatcher imple
     private volatile boolean keepDispatching;
     
     private final ExecutorService executor;
-    private final FluentQueue<FluentInputEvent> adminQueue;
-    private final FluentQueue<FluentInputEvent> loopbackQueue;
-    private final FluentQueue<FluentInputEvent> requestQueue;
-    private final FluentQueue<FluentInputEvent> executionQueue;
-    private final FluentQueue<FluentInputEvent> referenceQueue;
-    private final FluentQueue<FluentInputEvent> marketDataQueue;
+    private final FluentMPSCQueue<FluentInputEvent> mpscQueue;
+    private final FluentSPSCQueue<FluentInputEvent> marketDataQueue;
 
     private final static int DEFAULT_SIZE	= FOUR * SIXTY_FOUR * SIXTY_FOUR;
     private final static String NAME        = FluentInputEventDispatcher.class.getSimpleName();
@@ -57,23 +53,22 @@ public final class FluentInputEventDispatcher extends InputEventDispatcher imple
     	this( backoff, null );
     }
     
+    
     public FluentInputEventDispatcher( BackoffStrategy backoff, FluentPersister<FluentInputEvent> persister ){
     	this( backoff, persister, new HashSet<FluentInputEventType>( Arrays.asList(FluentInputEventType.EXECUTION_REPORT_UPDATE) ) );
     }
     
+    
     public FluentInputEventDispatcher( BackoffStrategy backoff, FluentPersister<FluentInputEvent> persister, Set<FluentInputEventType> recoverables ){
-        this( backoff, persister, recoverables, new int[]{DEFAULT_SIZE,DEFAULT_SIZE,DEFAULT_SIZE,DEFAULT_SIZE,DEFAULT_SIZE,DEFAULT_SIZE} );
+        this( backoff, persister, recoverables, new int[]{DEFAULT_SIZE, DEFAULT_SIZE} );
     }
+    
     
     public FluentInputEventDispatcher( BackoffStrategy backoff, FluentPersister<FluentInputEvent> persister, Set<FluentInputEventType> recoverables, int[] capacities ){
         super( backoff, persister, recoverables );
 
-        this.adminQueue         = new FluentSPSCQueue<FluentInputEvent>( capacities[0] );
-        this.executionQueue     = new FluentSPSCQueue<FluentInputEvent>( capacities[1] );
-        this.loopbackQueue      = new FluentSPSCQueue<FluentInputEvent>( capacities[2] );
-        this.marketDataQueue    = new FluentSPSCQueue<FluentInputEvent>( capacities[3] );
-        this.referenceQueue     = new FluentSPSCQueue<FluentInputEvent>( capacities[4] );
-        this.requestQueue       = new FluentSPSCQueue<FluentInputEvent>( capacities[5] );
+        this.mpscQueue         	= new FluentMPSCQueue<FluentInputEvent>( capacities[ ZERO ] );
+        this.marketDataQueue    = new FluentSPSCQueue<FluentInputEvent>( capacities[ ONE ] );
         this.executor           = Executors.newSingleThreadExecutor( new FluentThreadFactory(NAME) );
 
     }
@@ -90,31 +85,31 @@ public final class FluentInputEventDispatcher extends InputEventDispatcher imple
 
     @Override
     public final boolean addAdminEvent( final AdminEvent event ){
-        return adminQueue.offer( event );
+        return mpscQueue.offer( event );
     }
 
 
     @Override
     public final boolean addLoopbackEvent( final LoopbackEvent event ){
-        return loopbackQueue.offer( event );
+        return mpscQueue.offer( event );
     }
 
 
     @Override
     public final boolean addRequestEvent( final TraderDataEvent event ){
-        return requestQueue.offer( event );
+        return mpscQueue.offer( event );
     }
 
 
     @Override
     public final boolean addExecutionEvent( final ExecutionReportEvent event ){
-        return executionQueue.offer( event );
+        return mpscQueue.offer( event );
     }
 
 
     @Override
     public final boolean addReferenceDataEvent( final ReferenceDataEvent event ){
-        return referenceQueue.offer( event );
+        return mpscQueue.offer( event );
     }
 
 
@@ -124,91 +119,55 @@ public final class FluentInputEventDispatcher extends InputEventDispatcher imple
     }
 
 
+    
     @Override
     public final void run( ){
 
     	performRecovery( );
-
+    	    	
         while( keepDispatching ){
-            polledDispatch();
+        	
+        	try{
+
+        		FluentInputEvent otherEvent 	= mpscQueue.poll( );
+        		FluentInputEvent mdEvent		= marketDataQueue.poll( );
+
+        		boolean nothingPolled   		= ( otherEvent == null && mdEvent == null );
+        		if( nothingPolled ){
+        			getBackoff().apply();
+        			continue;
+        		}
+        		
+        		
+        		if( otherEvent != null ){
+        			for( FluentInputEventListener listener : getListeners() ){	
+        				if( listener.isSupported( otherEvent.getType() )){
+        					listener.update( otherEvent );
+        				}
+        			}
+        		}
+        		        		
+        		
+        		if( mdEvent != null ){
+        			for( FluentInputEventListener listener : getListeners() ){	
+        				if( listener.isSupported( mdEvent.getType() ) ){
+        					listener.update( mdEvent );
+        				}
+        			}
+        		}
+
+        		
+        		//getPersister().persistAll( adEvent, loEvent, rfEvent, exEvent, rqEvent, mdBucket );
+
+        	}catch( Exception e ){
+        		LOGGER.error("FAILED to dispatch input events.");
+        		LOGGER.error("Exception:", e);
+        	}
+
         }
-
+        
     }
-
-
-    /**
-     * NOTE: Do we need to prioritize listeners?
-     * Currently, the first listener will gets all events before the second one gets any.
-     */
-     protected final int polledDispatch( ){
-
-        int dispatchedCount         = ZERO;
-
-        try{
-
-            FluentInputEvent adEvent = adminQueue.poll( );
-            FluentInputEvent loEvent = loopbackQueue.poll( );
-            FluentInputEvent rfEvent = referenceQueue.poll( );
-            FluentInputEvent exEvent = executionQueue.poll( );
-            FluentInputEvent rqEvent = requestQueue.poll( );
-            FluentInputEvent mdEvent = marketDataQueue.poll( );
-
-            boolean nothingPolled   = (adEvent == null && loEvent == null && rfEvent == null && exEvent == null && rqEvent == null && mdEvent == null);
-            if( nothingPolled ){
-                getBackoff().apply();
-                return NEGATIVE_ONE;
-            }
-
-
-            for( FluentInputEventListener listener : getListeners() ){
-
-                if( adEvent != null && listener.isSupported(adEvent.getType()) ){
-                    listener.update( adEvent );
-                    ++dispatchedCount;
-                }
-
-                if( loEvent != null && listener.isSupported(loEvent.getType()) ){
-                    listener.update( loEvent );
-                    ++dispatchedCount;
-                }
-
-                if( rfEvent != null && listener.isSupported(rfEvent.getType()) ){
-                    listener.update( rfEvent );
-                    ++dispatchedCount;
-                }
-
-                if( exEvent != null && listener.isSupported(exEvent.getType()) ){
-                    listener.update( exEvent );
-                    ++dispatchedCount;
-                }
-
-                if( rqEvent != null && listener.isSupported(rqEvent.getType()) ){
-                    listener.update( rqEvent );
-                    ++dispatchedCount;
-                }
-
-                if( mdEvent != null && listener.isSupported(mdEvent.getType()) ){
-                    listener.update( mdEvent );
-                    ++dispatchedCount;
-                }
-
-                if( dispatchedCount == ZERO ){
-                    LOGGER.warn( "DEAD EVENT! Valid input events arrived but no listeners are interested!" );
-                }
-
-
-                //getPersister().persistAll( adEvent, loEvent, rfEvent, exEvent, rqEvent, mdEvent );
-
-            }
-
-        }catch( Exception e ){
-            LOGGER.error("FAILED to dispatch input events.");
-            LOGGER.error("Exception:", e);
-        }
-
-        return dispatchedCount;
-
-    }
+    
 
 
     @Override

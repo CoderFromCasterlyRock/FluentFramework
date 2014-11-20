@@ -3,7 +3,7 @@ package com.fluent.etrading.framework.events.in;
 import com.eclipsesource.json.JsonObject;
 import com.fluent.etrading.framework.events.core.FluentInputEvent;
 import com.fluent.etrading.framework.events.core.FluentInputEventType;
-import com.fluent.etrading.framework.market.core.MarketType;
+import com.fluent.etrading.framework.market.core.Marketplace;
 
 import static com.fluent.etrading.framework.events.core.FluentJsonTags.*;
 import static com.fluent.etrading.framework.utility.ContainerUtil.*;
@@ -12,8 +12,8 @@ import static com.fluent.etrading.framework.utility.JSONUtil.*;
 
 public final class MarketDataEvent extends FluentInputEvent{
 
-    private final MarketType market;
-    private final String instrumentId;
+    private final Marketplace market;
+    private final String symbol;
     private final boolean isCompact;
     
     private final double bid0;
@@ -41,7 +41,7 @@ public final class MarketDataEvent extends FluentInputEvent{
     private final int ask4Size;
 
     
-    public MarketDataEvent( long eventId, FluentInputEventType type, MarketType market, String instrumentId,
+    public MarketDataEvent( long eventId, FluentInputEventType type, Marketplace market, String instrumentId,
     						double bid, int bidSize, double ask, int askSize ){
     	
     	this( 	true, eventId, type, market, instrumentId, 
@@ -53,7 +53,7 @@ public final class MarketDataEvent extends FluentInputEvent{
     }
 
     
-    public MarketDataEvent( long eventId, FluentInputEventType type, MarketType market, String instrumentId,
+    public MarketDataEvent( long eventId, FluentInputEventType type, Marketplace market, String instrumentId,
     						double bid0, double bid1, double bid2, double bid3, double bid4,
     						int bid0Size, int bid1Size, int bid2Size, int bid3Size, int bid4Size,
     						double ask0, double ask1, double ask2, double ask3, double ask4,
@@ -68,7 +68,7 @@ public final class MarketDataEvent extends FluentInputEvent{
     }
 
 
-    protected MarketDataEvent( boolean isCompact, long eventId, FluentInputEventType type, MarketType market, String instrumentId,
+    protected MarketDataEvent( boolean isCompact, long eventId, FluentInputEventType type, Marketplace market, String instrumentId,
                             	double bid0, double bid1, double bid2, double bid3, double bid4,
                             	int bid0Size, int bid1Size, int bid2Size, int bid3Size, int bid4Size,
                             	double ask0, double ask1, double ask2, double ask3, double ask4,
@@ -77,7 +77,7 @@ public final class MarketDataEvent extends FluentInputEvent{
         super( eventId, type );
 
         this.market         = market;
-        this.instrumentId   = instrumentId;
+        this.symbol   = instrumentId;
         this.isCompact		= isCompact;
         
         this.bid0           = bid0;
@@ -111,8 +111,8 @@ public final class MarketDataEvent extends FluentInputEvent{
         return getEventId();
     }
 
-    public final String getInstrumentId( ){
-        return instrumentId;
+    public final String getSymbol( ){
+        return symbol;
     }
     
     public final boolean isCompact( ){
@@ -120,7 +120,7 @@ public final class MarketDataEvent extends FluentInputEvent{
     }
 
 
-    public final MarketType getMarket( ){
+    public final Marketplace getMarket( ){
         return market;
     }
 
@@ -210,7 +210,7 @@ public final class MarketDataEvent extends FluentInputEvent{
 
         object.add( MARKET_DATA_ID.field(), getMarketDataId() );
         object.add( MARKET.field(),         getMarket().name() );
-        object.add( INSTRUMENT_NAME.field(),getInstrumentId() );
+        object.add( INSTRUMENT_NAME.field(),getSymbol() );
         object.add( BID0.field(),           getBid0() );
         object.add( BID1.field(),           getBid1() );
         object.add( BID2.field(),           getBid2() );
@@ -245,7 +245,7 @@ public final class MarketDataEvent extends FluentInputEvent{
         return new MarketDataEvent(
                 valueAsLong(EVENT_ID, object),
                 valueAsInputType( object ),
-                MarketType.valueOf( valueAsString( MARKET, object ) ),
+                Marketplace.valueOf( valueAsString( MARKET, object ) ),
                 valueAsString( INSTRUMENT_NAME, object ),
                 valueAsDouble( BID0, object ),
                 valueAsDouble( BID1, object ),
@@ -269,5 +269,6 @@ public final class MarketDataEvent extends FluentInputEvent{
                 valueAsInt( ASK4SIZE, object ) );
 
     }
+    
 
 }

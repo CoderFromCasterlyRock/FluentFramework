@@ -5,7 +5,6 @@ import org.slf4j.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-import com.fluent.etrading.framework.collections.*;
 import com.fluent.etrading.framework.core.*;
 import com.fluent.etrading.framework.dispatcher.core.*;
 import com.fluent.etrading.framework.events.core.*;
@@ -21,7 +20,7 @@ public final class BlockingOutputEventDispatcher extends OutputEventDispatcher i
     private volatile boolean keepDispatching;
 
     private final ExecutorService executor;
-    private final FluentQueue<FluentOutputEvent> queue;
+    private final BlockingQueue<FluentOutputEvent> queue;
 
     private final static String NAME        = BlockingOutputEventDispatcher.class.getSimpleName();
     private final static Logger LOGGER      = LoggerFactory.getLogger( NAME );
@@ -36,11 +35,11 @@ public final class BlockingOutputEventDispatcher extends OutputEventDispatcher i
     }
     
     public BlockingOutputEventDispatcher( BackoffStrategy backoff, FluentPersister<FluentOutputEvent> persister, Set<FluentOutputEventType> recoverables ){
-        this( backoff, persister, recoverables, new FluentBlockingQueue<FluentOutputEvent>( SIXTY_FOUR * SIXTY_FOUR ) );
+        this( backoff, persister, recoverables, new ArrayBlockingQueue<FluentOutputEvent>( SIXTY_FOUR * SIXTY_FOUR ) );
     }
     
     
-    public BlockingOutputEventDispatcher( BackoffStrategy backoff, FluentPersister<FluentOutputEvent> persister, Set<FluentOutputEventType> recoverables, FluentBlockingQueue<FluentOutputEvent> queue ){
+    public BlockingOutputEventDispatcher( BackoffStrategy backoff, FluentPersister<FluentOutputEvent> persister, Set<FluentOutputEventType> recoverables, BlockingQueue<FluentOutputEvent> queue ){
         super( backoff, persister, recoverables );
 
         this.queue      = queue;
@@ -80,51 +79,32 @@ public final class BlockingOutputEventDispatcher extends OutputEventDispatcher i
     	performRecovery( );
     	
         while( keepDispatching ){
-            dispatch( );
-        }
-
-    }
-
-
-    protected final int dispatch(  ){
-
-        int dispatchedCount         = ZERO;
-
-        try{
-
-            FluentOutputEvent event  = queue.poll( );
-            boolean nothingPolled   = (event == null);
-            if( nothingPolled ){
-                getBackoff().apply();
-                return NEGATIVE_ONE;
-            }
-
-            
-            for( FluentOutputEventListener listener : getListeners() ){
-                if( listener.isSupported(event.getType()) ){
-                    listener.update( event );
-                    ++dispatchedCount;
-                }
-            }
-
-            
-            if( dispatchedCount == ZERO ){
-                LOGGER.warn( "DEAD EVENT! Valid output events arrived but no listeners are registered!" );
-                LOGGER.warn( "[{}]", event.toJSON() );
-            }
-            
-            
-            getPersister().persist( event );
-
        
-        }catch( Exception e ){
-            LOGGER.error("FAILED to dispatch output events.");
-            LOGGER.error("Exception:", e);
+        	try{
 
+        		FluentOutputEvent event  = queue.poll( );
+        		boolean nothingPolled   = (event == null);
+        		if( nothingPolled ){
+        			getBackoff().apply();
+        			continue;
+        		}
+
+            
+        		for( FluentOutputEventListener listener : getListeners() ){
+        			if( listener.isSupported(event.getType()) ){
+        				listener.update( event );
+        			}
+        		}
+        
+        		//getPersister().persist( event );
+       
+        	}catch( Exception e ){
+        		LOGGER.error("FAILED to dispatch output events.");
+        		LOGGER.error("Exception:", e);
+        	}
+        
         }
-
-        return dispatchedCount;
-
+        
     }
 
 

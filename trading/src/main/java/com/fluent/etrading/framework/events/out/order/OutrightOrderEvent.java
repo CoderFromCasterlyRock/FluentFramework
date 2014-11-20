@@ -17,7 +17,7 @@ public final class OutrightOrderEvent extends OrderEvent{
 
 
     public OutrightOrderEvent( long strategyId, long orderId, long mdEventId, FluentOutputEventType type,
-                               MarketType marketType, OrderType orderType,
+                               Marketplace marketType, OrderType orderType,
                                String instrumentId, Side side, double price, int sendQuantity, int showQuantity,
                                String traderId, String traderName, String portfolio ){
 
@@ -78,7 +78,7 @@ public final class OutrightOrderEvent extends OrderEvent{
                 valueAsLong(ORDER_ID, object),
                 valueAsLong( MARKET_DATA_ID, object),
                 FluentOutputEventType.valueOf( valueAsString( EVENT_TYPE, object )),
-                MarketType.valueOf( valueAsString( MARKET, object ) ),
+                Marketplace.valueOf( valueAsString( MARKET, object ) ),
                 OrderType.valueOf( valueAsString( ORDER_TYPE, object ) ),
                 valueAsString( INSTRUMENT_NAME, object ),
                 Side.valueOf( valueAsString( SIDE, object ) ),

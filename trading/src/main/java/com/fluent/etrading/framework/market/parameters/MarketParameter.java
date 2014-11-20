@@ -1,15 +1,15 @@
 package com.fluent.etrading.framework.market.parameters;
 
 import com.fluent.etrading.framework.events.out.order.OrderEvent;
-import com.fluent.etrading.framework.market.core.MarketType;
+import com.fluent.etrading.framework.market.core.Marketplace;
 import com.fluent.etrading.framework.order.OrderType;
 
 
 public abstract class MarketParameter<R, O extends OrderEvent>{
 
-    private final MarketType type;
+    private final Marketplace type;
 
-    public MarketParameter( MarketType type ){
+    public MarketParameter( Marketplace type ){
         this.type   = type;
     }
 
@@ -18,7 +18,7 @@ public abstract class MarketParameter<R, O extends OrderEvent>{
     protected abstract R cancelOrderParams( O event );
 
 
-    public final MarketType getMarketType( ){
+    public final Marketplace getMarketType( ){
         return type;
     }
 

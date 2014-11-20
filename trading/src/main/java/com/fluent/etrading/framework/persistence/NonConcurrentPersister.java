@@ -46,7 +46,7 @@ public abstract class NonConcurrentPersister<EVENT extends FluentEvent> implemen
 
     }
 
-    protected final String getFileName(  ){
+    protected final String getFileName( ){
         return location;
     }
 

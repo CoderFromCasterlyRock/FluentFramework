@@ -1,18 +1,29 @@
 package com.fluent.etrading.framework.collections;
 
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.*;
+
+import static com.fluent.etrading.framework.utility.ContainerUtil.*;
 
 
-public final class PaddedAtomicLong extends AtomicLong{
+public class PaddedAtomicLong extends AtomicLong{
+	
+	public volatile long p1, p2, p3, p4, p5, p6 = 7L;
 
-	private static final long serialVersionUID = 1L;
-
-	public PaddedAtomicLong(){}
-
+	private static final long serialVersionUID = ONE;
+	
+	
+    public PaddedAtomicLong( ){
+    	this( ZERO );
+    }
+    
     public PaddedAtomicLong( final long initialValue ){
-        super( initialValue );
+        super(initialValue);
     }
 
-    public volatile long p1, p2, p3, p4, p5, p6 = 7;
-
+    
+    public final long foilJVMOptimization(){
+        return p1 + p2 + p3 + p4 + p5 + p6;
+    }
+    
+    
 }

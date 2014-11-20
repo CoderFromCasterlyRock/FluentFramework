@@ -5,7 +5,7 @@ import static com.fluent.etrading.framework.utility.ContainerUtil.*;
 
 public final class IONMarket extends Market{
 
-    public IONMarket( MarketType type, String currency, String executionSource, String marketDataSource ){
+    public IONMarket( Marketplace type, String currency, String executionSource, String marketDataSource ){
         super( type, currency, executionSource, marketDataSource );
     }
 

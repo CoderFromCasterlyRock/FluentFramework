@@ -3,14 +3,14 @@ package com.fluent.etrading.framework.market.parameters;
 import java.util.*;
 
 import com.fluent.etrading.framework.events.out.order.OrderEvent;
-import com.fluent.etrading.framework.market.core.MarketType;
+import com.fluent.etrading.framework.market.core.Marketplace;
 
 
 public class TIBCOBtecMarketParameter extends TIBCOMarketParameter{
 
 
     public TIBCOBtecMarketParameter( ){
-        super( MarketType.BTEC );
+        super( Marketplace.BTEC );
     }
 
 

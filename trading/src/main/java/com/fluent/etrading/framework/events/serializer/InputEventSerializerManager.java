@@ -31,8 +31,8 @@ public class InputEventSerializerManager{
             		return LoopbackEvent.convert(jsonString, object);
             	
             	case TREASURY_MD:
-            	case T_FUTURES_MD:
-            	case ED_FUTURES_MD:
+            	case FUTURES_MD:
+            	case SWAPS_MD:
             		return MarketDataEvent.convert(jsonString, object);
             		            
             	case EXECUTION_REPORT_UPDATE:

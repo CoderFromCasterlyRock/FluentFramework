@@ -6,21 +6,21 @@ import com.fluent.etrading.framework.collections.*;
 public final class FluentOutputEventId{
 
 
-	private final static FluentAtomicLong ID = new FluentAtomicLong();
+	private final static FluentAtomicLongCounter ID = new FluentAtomicLongCounter();
 
     
     public final static void set( long newId ){
-        ID.set( newId );
+        ID.getAndSet( newId );
     }
     
     
     public final static long current( ){
-        return ID.getCurrent( );
+        return ID.get( );
     }
 
 
     public final static long nextId( ){
-        return ID.getNext();
+        return ID.getAndIncrement();
     }
 
     
