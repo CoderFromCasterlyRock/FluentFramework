@@ -1,9 +1,10 @@
 package com.fluent.etrading.framework.core;
 
 import org.slf4j.*;
-import java.util.concurrent.*;
 
-import com.fluent.etrading.framework.dispatcher.core.BackoffStrategy;
+import java.util.concurrent.*;
+import java.util.concurrent.locks.LockSupport;
+
 import com.fluent.etrading.framework.dispatcher.in.InputEventDispatcher;
 import com.fluent.etrading.framework.dispatcher.out.OutputEventDispatcher;
 
@@ -57,12 +58,11 @@ public final class FluentController implements FluentService{
 				input.startDispatch();
 				output.startDispatch();
 		
-				BackoffStrategy bOff	= new BackoffStrategy( ONE, SECONDS );
 				long sleepDuration		= MILLISECONDS.convert( time, unit );
 				long startTime 		 	= nowMillis();
 					
 				while( (nowMillis() - startTime ) < sleepDuration ){
-					bOff.apply();
+					LockSupport.parkNanos( THOUSAND * THOUSAND );
 				}
 			
 				FluentContext.setState( RUNNING );

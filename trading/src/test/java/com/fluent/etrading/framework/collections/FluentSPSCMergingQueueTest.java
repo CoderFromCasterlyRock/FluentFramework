@@ -85,10 +85,6 @@ public class FluentSPSCMergingQueueTest implements MarketDataEventProvider{
 	    }
 
 
-	    public final void stop( ){
-	        executor.shutdown();
-	    }
-
 	}
 
 
