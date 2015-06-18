@@ -1,43 +1,22 @@
 package com.fluent.framework.analysis;
 
 import org.slf4j.*;
-
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.elasticsearch.node.*;
-
-import com.fluent.framework.collection.FluentBackoffStrategy;
 import com.fluent.framework.core.*;
-import com.fluent.framework.events.core.FluentEvent;
-import com.fluent.framework.events.core.FluentInboundEvent;
-import com.fluent.framework.events.core.FluentInboundListener;
-import com.fluent.framework.events.core.FluentInboundType;
-import com.fluent.framework.events.core.FluentOutboundEvent;
-import com.fluent.framework.events.core.FluentOutboundListener;
-import com.fluent.framework.events.core.FluentOutboundType;
-import com.fluent.framework.events.in.InboundEventDispatcher;
-import com.fluent.framework.events.out.OutboundEventDispatcher;
-import com.fluent.framework.util.TimeUtil;
-import com.sun.corba.se.pept.transport.InboundConnectionCache;
-
-import org.elasticsearch.client.*;
+import com.fluent.framework.events.core.*;
+import com.fluent.framework.collection.*;
+import com.fluent.framework.events.in.*;
+import com.fluent.framework.events.out.*;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.action.index.*;
-import org.elasticsearch.action.delete.*;
-import org.elasticsearch.common.inject.spi.HasDependencies;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.xcontent.*;
-import org.elasticsearch.action.admin.indices.delete.*;
-import org.elasticsearch.action.admin.indices.exists.indices.*;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
-import org.hamcrest.core.IsEqual;
-import org.jctools.queues.SpscArrayQueue;
 
-import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
+import static com.fluent.framework.util.TimeUtil.*;
 import static com.fluent.framework.util.FluentUtil.*;
 
 
@@ -57,7 +36,7 @@ public final class FluentElasticSearchClient implements Runnable, FluentInboundL
     private final BlockingQueue<FluentEvent> queue;
     
     private final static String DEFAULT_INDEX_PREFIX    = "Fluent-";
-    private final static String DEFAULT_INDEX_SUFFIX	= "-" + TimeUtil.TODAY;
+    private final static String DEFAULT_INDEX_SUFFIX	= "-" + TODAY;
     private final static String NAME    				= FluentElasticSearchClient.class.getSimpleName();
     private final static Logger LOGGER  				= LoggerFactory.getLogger( NAME );
 

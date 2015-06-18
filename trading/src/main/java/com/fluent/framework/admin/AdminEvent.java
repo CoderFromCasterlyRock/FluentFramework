@@ -10,7 +10,7 @@ public abstract class AdminEvent extends FluentInboundEvent{
 	private final String eventId;
 	
 	private final static String PREFIX = "Admin_";
-
+	private final static long serialVersionUID = 1l;
 	
 	public AdminEvent( FluentInboundType type, String message ){
 	    super( type );
