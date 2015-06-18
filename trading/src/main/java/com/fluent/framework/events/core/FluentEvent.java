@@ -1,5 +1,7 @@
 package com.fluent.framework.events.core;
 
+import java.io.Serializable;
+
 import com.eclipsesource.json.*;
 import com.fluent.framework.collection.*;
 
@@ -7,11 +9,12 @@ import static com.fluent.framework.events.core.FluentJsonTags.*;
 import static com.fluent.framework.util.TimeUtil.*;
 
 
-public abstract class FluentEvent{
+public abstract class FluentEvent implements Serializable{
 
-    private final long sequenceId;
+	private final long sequenceId;
     private final long timeCreated;
-    
+
+	private final static long serialVersionUID = 1l;
     private final static FluentAtomicLong SEQUENCE_GEN = new FluentAtomicLong(); 
     
     

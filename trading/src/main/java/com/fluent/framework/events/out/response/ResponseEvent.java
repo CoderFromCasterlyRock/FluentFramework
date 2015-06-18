@@ -15,6 +15,8 @@ public final class ResponseEvent extends FluentOutboundEvent{
     private final String message;
 
     private final static String PREFIX = "RESPONSE_";
+    private final static long serialVersionUID = 1l;
+    
     
     public ResponseEvent( String strategyId, String orderId, String message ){
         super( EVENT_TO_TRADER );

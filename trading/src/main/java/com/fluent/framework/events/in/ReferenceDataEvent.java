@@ -14,7 +14,7 @@ public final class ReferenceDataEvent extends FluentInboundEvent{
 	private final String message;
 	
 	private final static String PREFIX = "REFERENCE_";
-    
+	private final static long serialVersionUID = 1l;
 	
 	public ReferenceDataEvent( String message ){
 

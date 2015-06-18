@@ -16,7 +16,7 @@ public final class LoopbackEvent extends FluentInboundEvent{
     private final FluentInboundEvent event;
 
     private final static String PREFIX = "LOOPBACK_";
-    
+    private final static long serialVersionUID = 1l;
     
     public LoopbackEvent( boolean isValid, FluentInboundEvent event, String reason ){
         super( LOOPBACK_EVENT );

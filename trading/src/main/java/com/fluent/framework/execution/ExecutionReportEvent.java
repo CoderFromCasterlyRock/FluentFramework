@@ -31,7 +31,8 @@ public final class ExecutionReportEvent extends FluentInboundEvent{
     private final double executionQuantity;
     private final long executionTime;
     
-
+    private final static long serialVersionUID = 1l;
+    
     public ExecutionReportEvent( String strategyId, String orderId, OrderFillStatus oStatus, String reason,
                                  OrderType oType, Side side, Exchange mType, String symbol ){
 

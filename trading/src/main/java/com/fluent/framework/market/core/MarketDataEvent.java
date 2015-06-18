@@ -18,6 +18,7 @@ public final class MarketDataEvent extends FluentInboundEvent{
     private final double ask;
     private final int askSize;
 
+    private final static long serialVersionUID = 1l;
     
     public MarketDataEvent( Exchange exchange, String symbol, double bid, int bidSize, double ask, int askSize ){
     	

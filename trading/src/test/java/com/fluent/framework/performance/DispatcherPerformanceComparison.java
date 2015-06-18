@@ -3,7 +3,7 @@ package com.fluent.framework.performance;
 import com.fluent.framework.collection.*;
 import com.fluent.framework.events.core.*;
 import com.fluent.framework.events.in.*;
-import com.fluent.framework.events.serializer.*;
+import com.fluent.framework.events.persister.*;
 import com.fluent.framework.test.*;
 
 

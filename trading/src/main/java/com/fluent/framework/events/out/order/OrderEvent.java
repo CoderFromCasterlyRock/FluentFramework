@@ -28,6 +28,8 @@ public final class OrderEvent extends FluentOutboundEvent{
     private final String portfolio;
 
     private final static String PREFIX = "ORDER_";
+    private final static long serialVersionUID = 1l;
+    
 
 
     public OrderEvent( String strategyId, String orderId, Exchange exchange, OrderType orderType,
