@@ -1,4 +1,4 @@
-package com.fluent.framework.performance;
+package com.fluent.framework.collection;
 
 import java.util.*;
 import java.util.concurrent.*;

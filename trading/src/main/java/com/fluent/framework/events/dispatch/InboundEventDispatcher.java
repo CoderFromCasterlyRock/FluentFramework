@@ -1,17 +1,14 @@
-package com.fluent.framework.events.in;
+package com.fluent.framework.events.dispatch;
 
 import org.slf4j.*;
 
 import java.util.*;
 import java.util.concurrent.*;
+import org.jctools.queues.*;
 
-import org.jctools.queues.MpscArrayQueue;
-
-import com.fluent.framework.collection.FluentBackoffStrategy;
 import com.fluent.framework.core.*;
-import com.fluent.framework.events.core.FluentInboundEvent;
-import com.fluent.framework.events.core.FluentInboundListener;
-import com.fluent.framework.events.persister.FluentPersister;
+import com.fluent.framework.collection.*;
+import com.fluent.framework.events.core.*;
 
 import static com.fluent.framework.util.FluentUtil.*;
 
@@ -21,28 +18,42 @@ public final class InboundEventDispatcher implements FluentService, Runnable{
     private volatile boolean keepDispatching;
 
     private final ExecutorService executor;
-    private final FluentPersister persister;
-    private final AbstractQueue<FluentInboundEvent> queue;
+    
+    private final static AbstractQueue<FluentInboundEvent> eventQueue;
     private final static List<FluentInboundListener> LISTENERS;
     
+    private final static int DEFAULT_SIZE   = SIXTY_FOUR * SIXTY_FOUR; 
     private final static String NAME        = InboundEventDispatcher.class.getSimpleName();
     private final static Logger LOGGER      = LoggerFactory.getLogger( NAME );
     
-    static{
-    	LISTENERS = new CopyOnWriteArrayList<FluentInboundListener>( );
-    }
-        
     
-    public InboundEventDispatcher( int capacity, FluentPersister persister  ){
-    	this.persister		= persister;
-        this.queue      	= new MpscArrayQueue<>(capacity);
-        this.executor   	= Executors.newSingleThreadExecutor( new FluentThreadFactory(NAME) );
+    static{
+    	eventQueue	= new MpscArrayQueue<>( DEFAULT_SIZE );
+    	LISTENERS 	= new CopyOnWriteArrayList<FluentInboundListener>( );
+    }
+    
+    
+    public InboundEventDispatcher( ){
+    	this.executor	= Executors.newSingleThreadExecutor( new FluentThreadFactory(NAME) );
     }
 
    
     @Override
     public final String name( ){
     	return NAME;
+    }
+    
+    
+    protected final void warmUp( FluentInboundEvent event ){
+    	
+    	for( int i =ZERO; i <( TWO * DEFAULT_SIZE); i++ ){
+    		eventQueue.offer( event );
+    		eventQueue.poll( );
+    	}
+
+    	eventQueue.clear();
+    	LOGGER.info("[{}] Finished warming, queue size [{}].", NAME, eventQueue.size() );
+    	
     }
     
     
@@ -54,7 +65,7 @@ public final class InboundEventDispatcher implements FluentService, Runnable{
     		return;
     	}
     	
-    	persister.init();
+    //	warmUp( );
     	keepDispatching = true;
         executor.execute( this );
 
@@ -77,13 +88,13 @@ public final class InboundEventDispatcher implements FluentService, Runnable{
   
     
 
-    public final boolean enqueue( final FluentInboundEvent event ){
-        return queue.offer( event );
+    public final static boolean enqueue( final FluentInboundEvent event ){
+        return eventQueue.offer( event );
     }
 
     
     protected final int getQueueSize( ){
-    	return queue.size();
+    	return eventQueue.size();
     }
 
 
@@ -94,7 +105,7 @@ public final class InboundEventDispatcher implements FluentService, Runnable{
            
         	try{
 
-        		FluentInboundEvent event  = queue.poll( );
+        		FluentInboundEvent event  = eventQueue.poll( );
         		if( event == null  ){
         			FluentBackoffStrategy.apply( ONE );
         			continue;
@@ -105,9 +116,7 @@ public final class InboundEventDispatcher implements FluentService, Runnable{
         				listener.update(  event );
         			}
         		}
-                
-        		persister.persist( event );
-        		
+                        		
         	}catch( Exception e ){
         		LOGGER.error("FAILED to dispatch Inbound events.");
         		LOGGER.error("Exception:", e);

@@ -10,6 +10,7 @@ public abstract class FluentInboundEvent extends FluentEvent{
     public FluentInboundEvent( FluentInboundType type ){
         this.type   = type;    	
     }
+   
         
 
     @Override

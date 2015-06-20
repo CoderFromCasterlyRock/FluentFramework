@@ -125,7 +125,7 @@ public final class ExecutionReportEvent extends FluentInboundEvent{
 
 
     @Override
-    protected final String toJSON( final JsonObject object ){
+    protected final void toJSON( final JsonObject object ){
 
         object.add( STRATEGY_ID.field(),        getStrategyId() );
         object.add( ORDER_ID.field(),           getOrderId() );
@@ -140,8 +140,6 @@ public final class ExecutionReportEvent extends FluentInboundEvent{
         object.add( IS_REJECTED.field(),        isRejected() );
         object.add( REJECTED_REASON.field(),    getRejectionReason() );
         
-        return object.toString();
-
     }
 
     

@@ -37,9 +37,9 @@ public final class ReferenceDataEvent extends FluentInboundEvent{
 
     
     @Override
-    protected final String toJSON( final JsonObject object ){
+    protected final void toJSON( final JsonObject object ){
         object.add( REF_DATA_TAG.field(), getData() );
-        return object.toString();
+        
     }
 
 

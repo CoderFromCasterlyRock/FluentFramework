@@ -14,18 +14,19 @@ public abstract class FluentEvent implements Serializable{
 	private final long sequenceId;
     private final long timeCreated;
 
-	private final static long serialVersionUID = 1l;
-    private final static FluentAtomicLong SEQUENCE_GEN = new FluentAtomicLong(); 
+	private final static long serialVersionUID 			= 1l;
+    private final static FluentAtomicLong SEQUENCE_GEN 	= new FluentAtomicLong(); 
     
     
     protected FluentEvent( ){
         this.timeCreated	= currentNanos();
-        this.sequenceId		= SEQUENCE_GEN.getAndIncrement();
+        this.sequenceId		= nextSequenceId();
     }
+
 
     public abstract String getEventId( );
     public abstract FluentEventType getType();
-    protected abstract String toJSON( JsonObject object );
+    protected abstract void toJSON( JsonObject object );
 
 
     public final long getSequenceId( ){
@@ -45,6 +46,12 @@ public abstract class FluentEvent implements Serializable{
     
     public final FluentEventCategory getCategory( ){
         return getType().getCategory();
+    }
+    
+    
+    protected final static long nextSequenceId( ){
+    	//check the state, if we are in warmup then dont increment the sequenceId
+        return SEQUENCE_GEN.getAndIncrement();
     }
     
     

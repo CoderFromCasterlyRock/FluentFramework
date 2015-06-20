@@ -1,14 +1,15 @@
 package com.fluent.framework.analysis;
 
 import org.slf4j.*;
+
 import java.util.*;
 import java.util.concurrent.*;
 
 import com.fluent.framework.core.*;
 import com.fluent.framework.events.core.*;
+import com.fluent.framework.events.dispatch.*;
 import com.fluent.framework.collection.*;
-import com.fluent.framework.events.in.*;
-import com.fluent.framework.events.out.*;
+
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
@@ -69,6 +70,7 @@ public final class FluentElasticSearchClient implements Runnable, FluentInboundL
     @Override
  	public final void init(){
     	eService.submit( this );
+    	
     	InboundEventDispatcher.register( this );
     	OutboundEventDispatcher.register( this );
  		

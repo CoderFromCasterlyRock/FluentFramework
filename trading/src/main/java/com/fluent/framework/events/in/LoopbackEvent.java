@@ -52,12 +52,12 @@ public final class LoopbackEvent extends FluentInboundEvent{
     
    
     @Override
-    protected final String toJSON( final JsonObject object ){
+    protected final void toJSON( final JsonObject object ){
+    	
         object.add( REASON.field(),   			getReason() );
         object.add( INPUT_EVENT_ID.field(), 	getLoopbackEvent().getEventId());
         object.add( INPUT_EVENT_TYPE.field(), 	getLoopbackEvent().getType().getName());
                 
-        return object.toString();
     }
     
 

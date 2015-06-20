@@ -121,7 +121,7 @@ public final class OrderEvent extends FluentOutboundEvent{
 
     
     @Override
-    protected final String toJSON( final JsonObject object ){
+    protected final void toJSON( final JsonObject object ){
 
         object.add( STRATEGY_ID.field(),        getStrategyId() );
         object.add( ORDER_ID.field(),           getOrderId() );
@@ -136,7 +136,7 @@ public final class OrderEvent extends FluentOutboundEvent{
         object.add( TRADER_NAME.field(),        getTraderName() );
         object.add( PORTFOLIO.field(),          getPortfolio());
 
-        return object.toString();
     }
 
+    
 }

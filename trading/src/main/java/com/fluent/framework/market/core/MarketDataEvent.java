@@ -72,7 +72,7 @@ public final class MarketDataEvent extends FluentInboundEvent{
 
         
     @Override
-    protected final String toJSON( JsonObject object ){
+    protected final void toJSON( JsonObject object ){
 
         object.add( EXCHANGE.field(),	exchange.name() );
         object.add( SYMBOL.field(),		symbol );
@@ -80,8 +80,6 @@ public final class MarketDataEvent extends FluentInboundEvent{
         object.add( BIDSIZE.field(),    bidSize );
         object.add( ASK.field(),        ask );
         object.add( ASKSIZE.field(),    askSize );
-        
-        return object.toString();
 
     }
    

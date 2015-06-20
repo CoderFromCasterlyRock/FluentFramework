@@ -1,9 +1,8 @@
-package com.fluent.framework.performance;
+package com.fluent.framework.persistence;
 
 import java.io.File;
 import org.HdrHistogram.*;
 
-import com.fluent.framework.events.persister.*;
 import com.fluent.framework.market.core.Exchange;
 import com.fluent.framework.market.core.MarketDataEvent;
 

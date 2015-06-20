@@ -1,4 +1,4 @@
-package com.fluent.framework.events.persister;
+package com.fluent.framework.persistence;
 
 import java.util.*;
 
@@ -21,7 +21,7 @@ public final class FluentEventFstPersister implements FluentPersister{
 	private final FSTLongOffheapMap<FluentEvent> offHeapMap;
 	
 	private final static String JOURNAL_SUFFIX	= ".mmf";
-    private final static String NAME			= FluentEventFstPersister.class.getSimpleName();
+    private final static String NAME			= InboundEventPersisterService.class.getSimpleName();
     private final static Logger LOGGER      	= LoggerFactory.getLogger( NAME );
 
 

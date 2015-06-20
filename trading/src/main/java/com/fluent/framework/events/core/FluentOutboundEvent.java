@@ -12,6 +12,7 @@ public abstract class FluentOutboundEvent extends FluentEvent{
     	this.type   = type;    	
     }
 
+    
     @Override
     public final FluentOutboundType getType( ){
         return type;

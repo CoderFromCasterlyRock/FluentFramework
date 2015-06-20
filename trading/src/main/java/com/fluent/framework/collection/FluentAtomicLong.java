@@ -54,7 +54,7 @@ public final class FluentAtomicLong{
         if( id.compareAndSet(current, next) ){
             return true;
         }else{
-            FluentBackoffStrategy.park( ONE );
+            FluentBackoffStrategy.apply( ONE );
             return false;
         }
 

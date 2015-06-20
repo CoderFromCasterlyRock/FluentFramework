@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.*;
 
 import static com.fluent.framework.util.FluentUtil.*;
 
+
 public final class FluentThreadFactory implements ThreadFactory{
 
     private final String appName;

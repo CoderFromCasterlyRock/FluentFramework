@@ -51,14 +51,12 @@ public final class ResponseEvent extends FluentOutboundEvent{
 
     
     @Override
-    protected final String toJSON( final JsonObject object ){
+    protected final void toJSON( final JsonObject object ){
         
     	object.add( STRATEGY_ID.field(),     strategyId );
     	object.add( ORDER_ID.field(),  		 orderId );
     	object.add( UPDATE_MESSAGE.field(),  message );
         
-        return object.toString();
-
     }
 
 }

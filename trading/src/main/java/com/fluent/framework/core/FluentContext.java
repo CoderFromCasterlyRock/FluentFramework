@@ -1,15 +1,18 @@
 package com.fluent.framework.core;
 
 import java.util.Arrays;
-import java.util.concurrent.atomic.*;
 
-import static com.fluent.framework.core.FluentContext.State.*;
 import static com.fluent.framework.util.FluentUtil.*;
 
 
 public final class FluentContext{
 	
-    public enum Region{
+	private final static String APP_NAME_KEY 	= "Fluent.framework.appname";
+	private final static String APP_NAME		= System.getProperty( APP_NAME_KEY );
+	
+	
+	public enum Region{
+    	
         NA,
         EMEA;
 
@@ -56,15 +59,13 @@ public final class FluentContext{
         }
 
     }
-
     
+     
     public enum Instance{
         
     	FLUENT_OUTRIGHT,
-        FLUENT_STRATEGY,
-        FLUENT_EXCHANGE,
-    	FLUENT_MARKETDATA;
-
+        FLUENT_STRATEGY;
+        
         public static Instance getInstance( ){
             String name         = EMPTY;
             Instance instance   = null;
@@ -83,40 +84,51 @@ public final class FluentContext{
 
     }
 
+    
+	public enum FluentState{
+		
+		INITIALIZING 	("Initializing"),
+		PAUSED			("Paused"),
+		CANCEL_ONLY		("Cancel Only"),
+		RUNNING			("Running"),
+		STOPPING		("Stopping"),
+    	STOPPED			("Stopped");
+		
+		private final String description;
+		
+		private FluentState( String description ){
+			this.description = description;
+		}
+		
+		public final String getDescription( ){
+			return description;
+		}
+		
+	}
 	
-	public static final Region getRegion( ){
+	
+	public final static String getAppName( ){
+		return APP_NAME;
+	}
+	
+	
+	
+	public final static  Region getRegion( ){
         return Region.getRegion();
     }
 
 	
-	public static final Environment getEnvironment( ){
+	public final static  Environment getEnvironment( ){
         return Environment.getEnvironment();
     }
 
 	
-	public static final Instance getInstance( ){
+	public final static  Instance getInstance( ){
         return Instance.getInstance();
     }
 
-	  
-	public static final String getContainerInfo( ){
 
-        StringBuilder builder  = new StringBuilder( TWO * SIXTY_FOUR );
-        
-        builder.append( L_BRACKET );
-        builder.append( "Environment:" ).append( getEnvironment() );
-        builder.append( ", Region:" ).append( getRegion() );
-        builder.append( ", Instance:" ).append( getInstance() );
-        builder.append( ", State:" ).append( FluentContext.getState() );
-        builder.append( ", Process:" ).append( getFullProcessName() );
-        builder.append( R_BRACKET );
-
-        return builder.toString();
-
-    }
-	
-
-    private static void printUsageAndExit( String propName, String propValue, String choices ){
+    private final static void printUsageAndExit( String propName, String propValue, String choices ){
 
         StringBuilder usage = new StringBuilder( TWO * SIXTY_FOUR );
         usage.append( "[ERROR while starting Fluent Framework]" );
@@ -131,53 +143,6 @@ public final class FluentContext{
 
     }
     
-	public enum State{
-		
-		INITIALIZING 	("Initializing"),
-		RECOVERY		("Recovering"),
-		PAUSED			("Paused"),
-		CANCEL_ONLY		("Cancel Only"),
-		RUNNING			("Running");
-		
-		private final String description;
-		
-		private State( String description ){
-			this.description = description;
-		}
-		
-		public final String getDescription( ){
-			return description;
-		}
-		
-	}
-	
 
-	private final static AtomicReference<State> STATE;
-		
-	static{
-		STATE = new AtomicReference<State>( INITIALIZING );
-	}
-	
-	
-	public static final boolean isProd( ){
-        return ( Environment.PROD == getEnvironment() );
-    }
-	
-	
-	public static final boolean isReady( ){
-		return ( State.RUNNING == STATE.get() );
-	}
-		
-	
-	public static final State getState( ){
-		return STATE.get();
-	}
-	
-	
-	public static final State setState( State newState ){
-		return STATE.getAndSet( newState );
-	}
-	
-	
 
 }

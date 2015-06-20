@@ -50,7 +50,7 @@
     	<dependency>
 			<groupId>de.ruedigermoeller</groupId>
 			<artifactId>fst</artifactId>
-			<version>2.29</version>
+			<version>2.30</version>
 		</dependency>
 
     	<dependency>
@@ -65,10 +65,9 @@
             <artifactId>elasticsearch</artifactId>
             <version>1.4.0.Beta1</version>
         </dependency>
-        	
 
-        <!-- LOG Related -->
 
+        <!-- LOG Related --> 
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>

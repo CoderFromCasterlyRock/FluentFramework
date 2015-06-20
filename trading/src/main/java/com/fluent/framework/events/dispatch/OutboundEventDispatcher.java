@@ -1,18 +1,16 @@
-package com.fluent.framework.events.out;
+package com.fluent.framework.events.dispatch;
 
 import org.slf4j.*;
 
 import java.util.*;
+
+import org.jctools.queues.*;
+
 import java.util.concurrent.*;
 
-import org.jctools.queues.MpscArrayQueue;
-
-import com.fluent.framework.collection.FluentBackoffStrategy;
 import com.fluent.framework.core.*;
-import com.fluent.framework.events.core.FluentInboundListener;
-import com.fluent.framework.events.core.FluentOutboundEvent;
-import com.fluent.framework.events.core.FluentOutboundListener;
-import com.fluent.framework.events.persister.FluentEventFstPersister;
+import com.fluent.framework.collection.*;
+import com.fluent.framework.events.core.*;
 
 import static com.fluent.framework.util.FluentUtil.*;
 
@@ -22,40 +20,52 @@ public final class OutboundEventDispatcher implements FluentService, Runnable{
     private volatile boolean keepDispatching;
 
     private final ExecutorService executor;
-    private final FluentEventFstPersister persister;
-    private final AbstractQueue<FluentOutboundEvent> queue;
+    private final static AbstractQueue<FluentOutboundEvent> queue;
     private final static List<FluentOutboundListener> LISTENERS;
     
+    private final static int DEFAULT_SIZE   = SIXTY_FOUR * SIXTY_FOUR; 
     private final static String NAME        = OutboundEventDispatcher.class.getSimpleName();
     private final static Logger LOGGER      = LoggerFactory.getLogger( NAME );
     
+    
     static{
-    	LISTENERS = new CopyOnWriteArrayList<FluentOutboundListener>( );
+    	queue      	= new MpscArrayQueue<>( DEFAULT_SIZE );
+    	LISTENERS	= new CopyOnWriteArrayList<FluentOutboundListener>( );
     }
     
-    
-    public OutboundEventDispatcher( int capacity, FluentEventFstPersister persister  ){
         
-    	this.persister	= persister;
-        this.queue      = new MpscArrayQueue<>(capacity);
-        this.executor   = Executors.newSingleThreadExecutor( new FluentThreadFactory(NAME) );
+    public OutboundEventDispatcher( ){
+    	this.executor   = Executors.newSingleThreadExecutor( new FluentThreadFactory(NAME) );
     }
 
    
     @Override
-    public final String name( ){
+    public String name( ){
     	return NAME;
+    }
+    
+
+    protected final void warmUp( FluentOutboundEvent event ){
+    	
+    	for( int i =ZERO; i <( TWO * DEFAULT_SIZE); i++ ){
+    		queue.offer( event );
+    		queue.poll( );
+    	}
+
+    	queue.clear();
+    	
     }
     
     
     @Override
-    public final void init( ){
+    public void init( ){
       
     	if( keepDispatching ){
     		LOGGER.warn("Attempted to start {} while it is already running.", NAME );
     		return;
     	}
     	
+    	//warmUp( );
     	keepDispatching = true;
         executor.execute( this );
 
@@ -78,7 +88,7 @@ public final class OutboundEventDispatcher implements FluentService, Runnable{
   
     
 
-    public final boolean enqueue( final FluentOutboundEvent event ){
+    public final static boolean enqueue( final FluentOutboundEvent event ){
         return queue.offer( event );
     }
 
@@ -87,6 +97,9 @@ public final class OutboundEventDispatcher implements FluentService, Runnable{
     	return queue.size();
     }
 
+
+    protected void performPostOperation( FluentOutboundEvent event ){}
+    
 
     @Override
     public final void run( ){
@@ -106,9 +119,10 @@ public final class OutboundEventDispatcher implements FluentService, Runnable{
         				listener.update(  event );
         			}
         		}
-                
-        		persister.persist( event );
         		
+        		performPostOperation( event );
+        		
+                
         	}catch( Exception e ){
         		LOGGER.error("FAILED to dispatch outbound events.");
         		LOGGER.error("Exception:", e);
@@ -120,8 +134,9 @@ public final class OutboundEventDispatcher implements FluentService, Runnable{
 
 
     @Override
-    public final void stop( ){
-        keepDispatching = false;
+    public void stop( ){
+    	
+    	keepDispatching = false;
         executor.shutdown();
 
         LOGGER.info("Successfully stopped {}.", NAME );

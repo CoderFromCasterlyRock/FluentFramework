@@ -1,4 +1,4 @@
-package com.fluent.framework.events.persister;
+package com.fluent.framework.persistence;
 
 import java.util.*;
 import org.slf4j.*;
