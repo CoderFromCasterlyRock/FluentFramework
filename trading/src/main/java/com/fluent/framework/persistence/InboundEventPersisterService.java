@@ -8,7 +8,11 @@ import java.util.concurrent.*;
 import com.fluent.framework.core.*;
 import com.fluent.framework.collection.*;
 import com.fluent.framework.events.core.*;
-import com.fluent.framework.events.dispatch.InboundEventDispatcher;
+import com.fluent.framework.events.in.FluentInboundEvent;
+import com.fluent.framework.events.in.FluentInboundListener;
+import com.fluent.framework.events.in.FluentInboundType;
+import com.fluent.framework.events.in.InboundEventDispatcher;
+import com.fluent.framework.internal.InboundWarmupEvent;
 
 import static com.fluent.framework.util.FluentUtil.*;
 
@@ -48,8 +52,11 @@ public final class InboundEventPersisterService implements Runnable, FluentServi
 	}
 	
 	
-	protected final void warmUp( FluentInboundEvent event ){
+	@Override
+	public final void prime( ){
 	    	
+		FluentInboundEvent event = new InboundWarmupEvent();
+		
     	for( int i =ZERO; i <( TWO * eventCount); i++ ){
     		eventQueue.offer( event );
     		eventQueue.poll( );
@@ -66,7 +73,6 @@ public final class InboundEventPersisterService implements Runnable, FluentServi
     	
         keepDispatching = true;
         
-        warmUp( null );
         persister.init();
         service.prestartCoreThread();
         service.execute( this );

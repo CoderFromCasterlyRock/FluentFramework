@@ -3,8 +3,8 @@ package com.fluent.framework.events.in;
 import com.eclipsesource.json.JsonObject;
 import com.fluent.framework.events.core.*;
 
-import static com.fluent.framework.events.core.FluentInboundType.*;
 import static com.fluent.framework.events.core.FluentJsonTags.*;
+import static com.fluent.framework.events.in.FluentInboundType.*;
 import static com.fluent.framework.util.FluentUtil.*;
 
 

@@ -1,4 +1,4 @@
-package com.fluent.framework.events.dispatch;
+package com.fluent.framework.events.out;
 
 import org.slf4j.*;
 
@@ -9,8 +9,11 @@ import org.jctools.queues.*;
 import java.util.concurrent.*;
 
 import com.fluent.framework.core.*;
+import com.fluent.framework.internal.*;
+import com.fluent.framework.util.FluentThreadFactory;
 import com.fluent.framework.collection.*;
 import com.fluent.framework.events.core.*;
+import com.fluent.framework.events.in.FluentInboundListener;
 
 import static com.fluent.framework.util.FluentUtil.*;
 
@@ -20,7 +23,7 @@ public final class OutboundEventDispatcher implements FluentService, Runnable{
     private volatile boolean keepDispatching;
 
     private final ExecutorService executor;
-    private final static AbstractQueue<FluentOutboundEvent> queue;
+    private final static AbstractQueue<FluentOutboundEvent> QUEUE;
     private final static List<FluentOutboundListener> LISTENERS;
     
     private final static int DEFAULT_SIZE   = SIXTY_FOUR * SIXTY_FOUR; 
@@ -29,7 +32,7 @@ public final class OutboundEventDispatcher implements FluentService, Runnable{
     
     
     static{
-    	queue      	= new MpscArrayQueue<>( DEFAULT_SIZE );
+    	QUEUE      	= new MpscArrayQueue<>( DEFAULT_SIZE );
     	LISTENERS	= new CopyOnWriteArrayList<FluentOutboundListener>( );
     }
     
@@ -45,15 +48,20 @@ public final class OutboundEventDispatcher implements FluentService, Runnable{
     }
     
 
-    protected final void warmUp( FluentOutboundEvent event ){
+    @Override
+    public final void prime( ){
     	
-    	for( int i =ZERO; i <( TWO * DEFAULT_SIZE); i++ ){
-    		queue.offer( event );
-    		queue.poll( );
+    	int warmupSize				= SIXTY_FOUR * DEFAULT_SIZE;
+    	FluentOutboundEvent event 	= new OutboundWarmupEvent( );
+    	
+    	for( int i =ZERO; i <( SIXTY_FOUR * DEFAULT_SIZE); i++ ){
+    		QUEUE.offer( event );
+    		QUEUE.poll( );
     	}
 
-    	queue.clear();
-    	
+    	QUEUE.clear();
+    	LOGGER.info("Finished warming Outbound dispatch queue, fed [{}] events.", warmupSize );
+   
     }
     
     
@@ -65,7 +73,6 @@ public final class OutboundEventDispatcher implements FluentService, Runnable{
     		return;
     	}
     	
-    	//warmUp( );
     	keepDispatching = true;
         executor.execute( this );
 
@@ -89,16 +96,14 @@ public final class OutboundEventDispatcher implements FluentService, Runnable{
     
 
     public final static boolean enqueue( final FluentOutboundEvent event ){
-        return queue.offer( event );
+        return QUEUE.offer( event );
     }
 
     
     protected final int getQueueSize( ){
-    	return queue.size();
+    	return QUEUE.size();
     }
 
-
-    protected void performPostOperation( FluentOutboundEvent event ){}
     
 
     @Override
@@ -108,7 +113,7 @@ public final class OutboundEventDispatcher implements FluentService, Runnable{
            
         	try{
 
-        		FluentOutboundEvent event  = queue.poll( );
+        		FluentOutboundEvent event  = QUEUE.poll( );
         		if( event == null  ){
         			FluentBackoffStrategy.apply( ONE );
         			continue;
@@ -119,10 +124,7 @@ public final class OutboundEventDispatcher implements FluentService, Runnable{
         				listener.update(  event );
         			}
         		}
-        		
-        		performPostOperation( event );
-        		
-                
+      		
         	}catch( Exception e ){
         		LOGGER.error("FAILED to dispatch outbound events.");
         		LOGGER.error("Exception:", e);

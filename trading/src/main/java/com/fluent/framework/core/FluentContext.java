@@ -7,8 +7,36 @@ import static com.fluent.framework.util.FluentUtil.*;
 
 public final class FluentContext{
 	
-	private final static String APP_NAME_KEY 	= "Fluent.framework.appname";
-	private final static String APP_NAME		= System.getProperty( APP_NAME_KEY );
+	
+	
+	public enum APP{
+	
+		NAME;
+		
+		public static String getName( ){
+
+			String prop		= "fluent.framework.appname";
+			String name		= System.getProperty( prop );
+                
+			if( isBlank(name) ){
+               	StringBuilder usage = new StringBuilder( TWO * SIXTY_FOUR );
+               	usage.append( "[ERROR while starting Fluent Framework]" );
+               	usage.append( NEWLINE );
+               	usage.append( prop ).append( COLON ).append( name ).append(" is NOT valid!");
+               	usage.append( NEWLINE );
+               	usage.append( "Must specify Application name as a VM argument (-D): " );
+               	usage.append( NEWLINE );
+
+               	System.err.println( usage.toString() );
+                System.exit( ONE );
+            }
+
+    		return name;
+		}
+		
+
+
+	}
 	
 	
 	public enum Region{
@@ -88,9 +116,10 @@ public final class FluentContext{
 	public enum FluentState{
 		
 		INITIALIZING 	("Initializing"),
+		WARMING_UP		("Warming up"),
+		RUNNING			("Running"),
 		PAUSED			("Paused"),
 		CANCEL_ONLY		("Cancel Only"),
-		RUNNING			("Running"),
 		STOPPING		("Stopping"),
     	STOPPED			("Stopped");
 		
@@ -108,7 +137,7 @@ public final class FluentContext{
 	
 	
 	public final static String getAppName( ){
-		return APP_NAME;
+		return APP.getName();
 	}
 	
 	

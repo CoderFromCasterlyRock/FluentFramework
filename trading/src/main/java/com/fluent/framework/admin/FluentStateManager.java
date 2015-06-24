@@ -5,13 +5,15 @@ import org.slf4j.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
+import com.fluent.framework.config.FluentConfiguration;
 import com.fluent.framework.core.*;
 import com.fluent.framework.internal.*;
+import com.fluent.framework.util.FluentThreadFactory;
 import com.fluent.framework.util.TimeUtil;
 import com.fluent.framework.core.FluentContext.Environment;
 import com.fluent.framework.core.FluentContext.FluentState;
-import com.fluent.framework.events.core.FluentInboundEvent;
-import com.fluent.framework.events.dispatch.InboundEventDispatcher;
+import com.fluent.framework.events.in.FluentInboundEvent;
+import com.fluent.framework.events.in.InboundEventDispatcher;
 
 import static java.util.concurrent.TimeUnit.*;
 import static com.fluent.framework.util.FluentUtil.*;
@@ -19,7 +21,7 @@ import static com.fluent.framework.core.FluentContext.*;
 import static com.fluent.framework.core.FluentContext.FluentState.*;
 
 
-public final class FluentStateManager implements Runnable, FluentService{
+public final class FluentStateManager implements Runnable, FluentStartable{
 
 	private volatile boolean keepRunning;
 	
@@ -70,7 +72,7 @@ public final class FluentStateManager implements Runnable, FluentService{
 		LOGGER.info("Successfully started Application state manager, generating Metronome events every {} {}.", delay, unit );
 	
 	}
-
+	
 	
 	@Override
 	public final void run( ){
@@ -148,7 +150,8 @@ public final class FluentStateManager implements Runnable, FluentService{
         StringBuilder builder  = new StringBuilder( TWO * SIXTY_FOUR );
         
         builder.append( L_BRACKET );
-        builder.append( "Environment:" ).append( getEnvironment() );
+        builder.append( "AppName:" ).append( getAppName() );
+        builder.append( ", Environment:" ).append( getEnvironment() );
         builder.append( ", Region:" ).append( getRegion() );
         builder.append( ", Instance:" ).append( getInstance() );
         builder.append( ", State:" ).append( getState() );

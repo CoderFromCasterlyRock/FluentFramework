@@ -1,14 +1,17 @@
-package com.fluent.framework.events.dispatch;
+package com.fluent.framework.events.in;
 
 import org.slf4j.*;
 
 import java.util.*;
 import java.util.concurrent.*;
+
 import org.jctools.queues.*;
 
 import com.fluent.framework.core.*;
 import com.fluent.framework.collection.*;
 import com.fluent.framework.events.core.*;
+import com.fluent.framework.internal.InboundWarmupEvent;
+import com.fluent.framework.util.FluentThreadFactory;
 
 import static com.fluent.framework.util.FluentUtil.*;
 
@@ -19,7 +22,7 @@ public final class InboundEventDispatcher implements FluentService, Runnable{
 
     private final ExecutorService executor;
     
-    private final static AbstractQueue<FluentInboundEvent> eventQueue;
+    private final static AbstractQueue<FluentInboundEvent> QUEUE;
     private final static List<FluentInboundListener> LISTENERS;
     
     private final static int DEFAULT_SIZE   = SIXTY_FOUR * SIXTY_FOUR; 
@@ -28,7 +31,7 @@ public final class InboundEventDispatcher implements FluentService, Runnable{
     
     
     static{
-    	eventQueue	= new MpscArrayQueue<>( DEFAULT_SIZE );
+    	QUEUE		= new MpscArrayQueue<>( DEFAULT_SIZE );
     	LISTENERS 	= new CopyOnWriteArrayList<FluentInboundListener>( );
     }
     
@@ -44,15 +47,19 @@ public final class InboundEventDispatcher implements FluentService, Runnable{
     }
     
     
-    protected final void warmUp( FluentInboundEvent event ){
+    @Override
+    public final void prime(  ){
     	
-    	for( int i =ZERO; i <( TWO * DEFAULT_SIZE); i++ ){
-    		eventQueue.offer( event );
-    		eventQueue.poll( );
+    	int warmupSize				= SIXTY_FOUR * DEFAULT_SIZE;
+    	FluentInboundEvent event 	=  new InboundWarmupEvent( );
+    	
+    	for( int i =ZERO; i < warmupSize; i++ ){
+    		QUEUE.offer( event );
+    		QUEUE.poll( );
     	}
 
-    	eventQueue.clear();
-    	LOGGER.info("[{}] Finished warming, queue size [{}].", NAME, eventQueue.size() );
+    	QUEUE.clear();
+    	LOGGER.info("Finished warming Inbound dispatch queue, fed [{}] events.", warmupSize );
     	
     }
     
@@ -65,7 +72,6 @@ public final class InboundEventDispatcher implements FluentService, Runnable{
     		return;
     	}
     	
-    //	warmUp( );
     	keepDispatching = true;
         executor.execute( this );
 
@@ -89,12 +95,12 @@ public final class InboundEventDispatcher implements FluentService, Runnable{
     
 
     public final static boolean enqueue( final FluentInboundEvent event ){
-        return eventQueue.offer( event );
+        return QUEUE.offer( event );
     }
 
     
     protected final int getQueueSize( ){
-    	return eventQueue.size();
+    	return QUEUE.size();
     }
 
 
@@ -105,7 +111,7 @@ public final class InboundEventDispatcher implements FluentService, Runnable{
            
         	try{
 
-        		FluentInboundEvent event  = eventQueue.poll( );
+        		FluentInboundEvent event  = QUEUE.poll( );
         		if( event == null  ){
         			FluentBackoffStrategy.apply( ONE );
         			continue;

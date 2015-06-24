@@ -1,4 +1,4 @@
-package com.fluent.framework.test;
+package com.fluent.framework.market;
 
 import java.io.*;
 
@@ -7,16 +7,16 @@ import org.slf4j.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-import com.fluent.framework.core.FluentService;
-import com.fluent.framework.core.FluentThreadFactory;
+import com.fluent.framework.core.FluentStartable;
 import com.fluent.framework.market.core.Exchange;
 import com.fluent.framework.market.core.MarketDataEvent;
 import com.fluent.framework.market.core.MarketDataEventProvider;
+import com.fluent.framework.util.FluentThreadFactory;
 
 import static com.fluent.framework.util.FluentUtil.*;
 
 
-public final class DummyScheduledMDProducer implements Runnable, FluentService{
+public final class DummyScheduledMDProducer implements Runnable, FluentStartable{
 
     private final Exchange marketType;
     private final MarketDataEventProvider provider;

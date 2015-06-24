@@ -3,34 +3,35 @@ package com.fluent.framework.core;
 import org.slf4j.*;
 
 import com.fluent.framework.admin.FluentStateManager;
-import com.fluent.framework.events.core.FluentInboundEvent;
-import com.fluent.framework.events.core.FluentInboundListener;
-import com.fluent.framework.events.core.FluentInboundType;
-import com.fluent.framework.events.dispatch.*;
+import com.fluent.framework.config.FluentConfiguration;
+import com.fluent.framework.events.in.*;
+import com.fluent.framework.events.out.OutboundEventDispatcher;
 import com.fluent.framework.internal.MetronomeEvent;
 import com.fluent.framework.util.TimeUtil;
 
 import static com.fluent.framework.util.FluentUtil.*;
+import static com.fluent.framework.events.in.FluentInboundType.*;
 import static com.fluent.framework.core.FluentContext.FluentState.*;
 
 
-public final class FluentController implements FluentInboundListener, FluentService{
+public final class FluentController implements FluentInboundListener, FluentStartable{
 	
-	
+	private final FluentConfiguration config;
 	private final FluentStateManager stateManager;
-	private final InboundEventDispatcher input;
-	private final OutboundEventDispatcher output;
+	private final InboundEventDispatcher inDispatcher;
+	private final OutboundEventDispatcher outDispatcher;
 		
-	private final static String NAME        = FluentController.class.getSimpleName();
-    private final static Logger LOGGER      = LoggerFactory.getLogger( NAME );
+	private final static String NAME    = FluentController.class.getSimpleName();
+    private final static Logger LOGGER	= LoggerFactory.getLogger( NAME );
 
-    
     
 	public FluentController( FluentConfiguration config ){
 		
+		this.config			= config;
 		this.stateManager	= new FluentStateManager( config );
-		this.input			= new InboundEventDispatcher( );
-		this.output			= new OutboundEventDispatcher( );
+		this.inDispatcher	= new InboundEventDispatcher( );
+		this.outDispatcher	= new OutboundEventDispatcher( );
+		
 	}
 
 	
@@ -42,7 +43,7 @@ public final class FluentController implements FluentInboundListener, FluentServ
 	
 	@Override
 	public final boolean isSupported( FluentInboundType type ){
-		return FluentInboundType.METRONOME_EVENT == type;
+		return METRONOME_EVENT == type;
 	}
 
 
@@ -63,15 +64,14 @@ public final class FluentController implements FluentInboundListener, FluentServ
 			FluentStateManager.setState( INITIALIZING );
 			LOGGER.debug("Attempting to START Fluent Framework {}.", FluentStateManager.getFrameworkInfo() );
 			
-			//Runtime.getRuntime().addShutdownHook(hook);
+			primeServices( );
 			startServices( );
-						
+			
 			FluentStateManager.setState( RUNNING );
 			long timeTaken 	= TimeUtil.currentMillis( ) - startTime;
 			
 			LOGGER.info( "Successfully STARTED Fluent Framework in [{}] ms.", timeTaken );
 			LOGGER.info( "************************************************************** {}", NEWLINE );
-
 
         }catch( Exception e ){
         	LOGGER.error( "Fatal error while starting Fluent Framework." );
@@ -82,32 +82,44 @@ public final class FluentController implements FluentInboundListener, FluentServ
             
         }
 
-				
 	}
 	
+	
+	protected final void primeServices( ){
+		outDispatcher.prime();
+		inDispatcher.prime();
+	}
+
 	
 	protected final void startServices( ){
 		
 		InboundEventDispatcher.register( this );
 		
-		output.init();
-		input.init();
+		outDispatcher.init();
+		inDispatcher.init();
 		stateManager.init();
 	}
 	
 	
 	protected final void stopServices( ){
 		
-		input.stop();
-		output.stop();
+		inDispatcher.stop();
+		outDispatcher.stop();
 		stateManager.stop();
 		
 	}
 	
+	
+	//TODO: Convert Seconds to close to AfterHours, WorkingHOurs, ClosingHours enum?
 	protected final void handleMetronomeEvent( FluentInboundEvent event ){
 		
 		MetronomeEvent metroEvent 	= (MetronomeEvent) event;
 		long secondsToClose			= metroEvent.getSecondsToClose();
+		
+		if( secondsToClose <= 0 ){
+			LOGGER.warn("[{}] is running outside the configured working hours [{}], some features may be unavailable.", config.getAppName(), config.getWorkingHours() );
+			return;
+		}
 		
 		if( secondsToClose > 10 ){
 			LOGGER.debug("Metronome event arrives, we have [{}] seconds to close.", secondsToClose );
@@ -118,7 +130,6 @@ public final class FluentController implements FluentInboundListener, FluentServ
 		stop();
 		
 	}
-	
 	
 
 	@Override
@@ -138,5 +149,4 @@ public final class FluentController implements FluentInboundListener, FluentServ
 	}
 
 		
-	
 }

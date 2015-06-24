@@ -13,7 +13,7 @@ import com.fluent.framework.core.*;
 import static com.fluent.framework.util.FluentUtil.*;
 
 
-public final class FluentThreadExecutor<T> implements FluentService,  ExecutorService{
+public final class FluentThreadExecutor<T> implements FluentStartable,  ExecutorService{
 
 	private volatile boolean running;
     private volatile boolean stopped;

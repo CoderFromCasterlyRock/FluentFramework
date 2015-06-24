@@ -1,4 +1,5 @@
-package com.fluent.framework.events.core;
+package com.fluent.framework.events.in;
+
 
 
 public interface FluentInboundListener{

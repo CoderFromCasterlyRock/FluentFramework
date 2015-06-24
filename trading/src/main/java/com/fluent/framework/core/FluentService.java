@@ -1,10 +1,8 @@
 package com.fluent.framework.core;
 
 
-public interface FluentService{
+public interface FluentService extends FluentStartable{
 
-    public String name();
-    public void init();
-    public void stop();
+    public void prime( );
 
 }

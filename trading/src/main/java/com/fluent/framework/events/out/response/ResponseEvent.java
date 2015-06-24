@@ -2,9 +2,10 @@ package com.fluent.framework.events.out.response;
 
 import com.eclipsesource.json.*;
 import com.fluent.framework.events.core.*;
+import com.fluent.framework.events.out.FluentOutboundEvent;
 
 import static com.fluent.framework.events.core.FluentJsonTags.*;
-import static com.fluent.framework.events.core.FluentOutboundType.*;
+import static com.fluent.framework.events.out.FluentOutboundType.*;
 
 
 public final class ResponseEvent extends FluentOutboundEvent{

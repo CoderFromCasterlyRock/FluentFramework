@@ -1,6 +1,6 @@
 package com.fluent.framework.internal;
 
-import static com.fluent.framework.events.core.FluentInboundType.*;
+import static com.fluent.framework.events.in.FluentInboundType.*;
 
 
 public final class MetronomeEvent extends InternalEvent{

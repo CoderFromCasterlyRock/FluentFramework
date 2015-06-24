@@ -8,6 +8,8 @@ import org.nustaq.serialization.simpleapi.DefaultCoder;
 import org.nustaq.serialization.simpleapi.FSTCoder;
 
 import com.fluent.framework.events.core.*;
+import com.fluent.framework.events.in.FluentInboundEvent;
+import com.fluent.framework.events.out.FluentOutboundEvent;
 import com.fluent.framework.market.core.MarketDataEvent;
 
 import static com.fluent.framework.util.FluentUtil.*;

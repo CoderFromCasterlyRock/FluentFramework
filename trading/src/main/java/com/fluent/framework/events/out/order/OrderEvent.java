@@ -2,12 +2,13 @@ package com.fluent.framework.events.out.order;
 
 import com.eclipsesource.json.JsonObject;
 import com.fluent.framework.events.core.*;
+import com.fluent.framework.events.out.FluentOutboundEvent;
 import com.fluent.framework.market.core.*;
 import com.fluent.framework.order.OrderType;
 import com.fluent.framework.order.Side;
 
 import static com.fluent.framework.events.core.FluentJsonTags.*;
-import static com.fluent.framework.events.core.FluentOutboundType.*;
+import static com.fluent.framework.events.out.FluentOutboundType.*;
 
 
 public final class OrderEvent extends FluentOutboundEvent{

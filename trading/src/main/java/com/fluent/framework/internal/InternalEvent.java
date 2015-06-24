@@ -2,6 +2,8 @@ package com.fluent.framework.internal;
 
 import com.eclipsesource.json.JsonObject;
 import com.fluent.framework.events.core.*;
+import com.fluent.framework.events.in.FluentInboundEvent;
+import com.fluent.framework.events.in.FluentInboundType;
 
 
 public abstract class InternalEvent extends FluentInboundEvent{

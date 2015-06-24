@@ -1,4 +1,4 @@
-package com.fluent.framework.events.dispatch;
+package com.fluent.framework.events.in;
 
 import org.HdrHistogram.*;
 
@@ -8,10 +8,10 @@ import com.fluent.framework.market.core.Exchange;
 import com.fluent.framework.market.core.MarketDataEvent;
 import com.fluent.framework.persistence.FluentEventFstPersister;
 import com.fluent.framework.persistence.InboundEventPersisterService;
-import com.fluent.framework.events.core.FluentInboundEvent;
-import com.fluent.framework.events.core.FluentInboundListener;
-import com.fluent.framework.events.core.FluentInboundType;
-import com.fluent.framework.events.dispatch.InboundEventDispatcher;
+import com.fluent.framework.events.in.FluentInboundEvent;
+import com.fluent.framework.events.in.FluentInboundListener;
+import com.fluent.framework.events.in.FluentInboundType;
+import com.fluent.framework.events.in.InboundEventDispatcher;
 
 
 public final class InboundDispatcherPerformance{

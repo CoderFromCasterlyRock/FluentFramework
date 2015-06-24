@@ -1,6 +1,9 @@
-package com.fluent.framework.events.core;
+package com.fluent.framework.events.in;
 
 import java.util.*;
+
+import com.fluent.framework.events.core.FluentEventCategory;
+import com.fluent.framework.events.core.FluentEventType;
 
 import static com.fluent.framework.events.core.FluentEventCategory.*;
 
@@ -18,6 +21,7 @@ public enum FluentInboundType implements FluentEventType{
 	REFERENCE_DATA			    ( FROM_REFERENCE_CATEGORY ),
 	
 	METRONOME_EVENT				( FROM_INTERNAL_CATEGORY ),
+	WARM_UP_EVENT				( FROM_INTERNAL_CATEGORY ),
 	START_UP_EVENT				( FROM_INTERNAL_CATEGORY ),
 	CLOSING_DOWN_EVENT			( FROM_INTERNAL_CATEGORY ),
 	LOOPBACK_EVENT				( FROM_INTERNAL_CATEGORY ),

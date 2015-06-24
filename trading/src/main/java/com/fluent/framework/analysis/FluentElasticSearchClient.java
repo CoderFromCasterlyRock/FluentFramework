@@ -7,7 +7,12 @@ import java.util.concurrent.*;
 
 import com.fluent.framework.core.*;
 import com.fluent.framework.events.core.*;
-import com.fluent.framework.events.dispatch.*;
+import com.fluent.framework.events.in.*;
+import com.fluent.framework.events.out.FluentOutboundEvent;
+import com.fluent.framework.events.out.FluentOutboundListener;
+import com.fluent.framework.events.out.FluentOutboundType;
+import com.fluent.framework.events.out.OutboundEventDispatcher;
+import com.fluent.framework.util.FluentThreadFactory;
 import com.fluent.framework.collection.*;
 
 import org.elasticsearch.client.transport.NoNodeAvailableException;
@@ -21,7 +26,7 @@ import static com.fluent.framework.util.TimeUtil.*;
 import static com.fluent.framework.util.FluentUtil.*;
 
 
-public final class FluentElasticSearchClient implements Runnable, FluentInboundListener, FluentOutboundListener, FluentService{
+public final class FluentElasticSearchClient implements Runnable, FluentInboundListener, FluentOutboundListener, FluentStartable{
 
 	private volatile boolean isRunning;
 	

@@ -2,6 +2,8 @@ package com.fluent.framework.market.core;
 
 import com.eclipsesource.json.*;
 import com.fluent.framework.events.core.*;
+import com.fluent.framework.events.in.FluentInboundEvent;
+import com.fluent.framework.events.in.FluentInboundType;
 
 import static com.fluent.framework.events.core.FluentJsonTags.*;
 import static com.fluent.framework.util.FluentUtil.*;

@@ -10,6 +10,7 @@ import org.zeromq.ZMQ.*;
 import java.util.concurrent.*;
 
 import com.fluent.framework.core.*;
+import com.fluent.framework.util.FluentThreadFactory;
 
 import static com.fluent.framework.util.FluentUtil.*;
 

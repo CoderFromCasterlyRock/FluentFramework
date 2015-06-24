@@ -1,11 +1,11 @@
-package com.fluent.framework.test;
+package com.fluent.framework.market;
 
 import org.slf4j.*;
 
 import java.util.concurrent.*;
 
-import com.fluent.framework.core.FluentService;
-import com.fluent.framework.events.dispatch.*;
+import com.fluent.framework.core.FluentStartable;
+import com.fluent.framework.events.in.*;
 import com.fluent.framework.market.core.Exchange;
 import com.fluent.framework.market.core.MarketDataEvent;
 import com.fluent.framework.util.TimeUtil;
@@ -16,7 +16,7 @@ import static com.fluent.framework.util.FluentUtil.*;
 
 
 
-public final class DummyThrottledMDProducer implements Runnable, FluentService{
+public final class DummyThrottledMDProducer implements Runnable, FluentStartable{
 
 	private final long timeToRun;
 	private final long productionRate;

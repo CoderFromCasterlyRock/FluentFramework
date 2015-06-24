@@ -1,4 +1,6 @@
-package com.fluent.framework.events.core;
+package com.fluent.framework.events.out;
+
+import com.fluent.framework.events.core.FluentEvent;
 
 
 
@@ -11,7 +13,7 @@ public abstract class FluentOutboundEvent extends FluentEvent{
     public FluentOutboundEvent( FluentOutboundType type ){
     	this.type   = type;    	
     }
-
+    
     
     @Override
     public final FluentOutboundType getType( ){

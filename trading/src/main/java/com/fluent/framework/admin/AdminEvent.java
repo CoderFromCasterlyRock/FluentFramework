@@ -1,7 +1,7 @@
 package com.fluent.framework.admin;
 
-import com.fluent.framework.events.core.FluentInboundEvent;
-import com.fluent.framework.events.core.FluentInboundType;
+import com.fluent.framework.events.in.FluentInboundEvent;
+import com.fluent.framework.events.in.FluentInboundType;
 
 
 public abstract class AdminEvent extends FluentInboundEvent{
