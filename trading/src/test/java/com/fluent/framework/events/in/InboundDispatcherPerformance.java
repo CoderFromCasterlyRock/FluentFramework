@@ -1,11 +1,8 @@
 package com.fluent.framework.events.in;
 
 import org.HdrHistogram.*;
-
 import java.util.concurrent.*;
 
-import com.fluent.framework.market.core.Exchange;
-import com.fluent.framework.market.core.MarketDataEvent;
 import com.fluent.framework.persistence.FluentEventFstPersister;
 import com.fluent.framework.persistence.InboundEventPersisterService;
 import com.fluent.framework.events.in.FluentInboundEvent;
@@ -50,7 +47,7 @@ public final class InboundDispatcherPerformance{
         Thread.sleep( 2000 );
 
         for( int i = 0; i< eventCount; i++ ){
-        	MarketDataEvent event = new MarketDataEvent( Exchange.CME, "EDM6", 99.0, (100 + i), 99.50, (200 + i) );
+        	CustomInternalEvent event = new CustomInternalEvent( i );
         	InboundEventDispatcher.enqueue( event );
         	
         	if( System.nanoTime() - event.getCreationTime() < 5000 ){

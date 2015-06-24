@@ -1,8 +1,8 @@
 package com.fluent.framework.persistence;
 
 import java.util.*;
-
 import org.slf4j.*;
+
 import org.nustaq.offheap.FSTLongOffheapMap;
 import org.nustaq.serialization.simpleapi.DefaultCoder;
 import org.nustaq.serialization.simpleapi.FSTCoder;
@@ -10,7 +10,6 @@ import org.nustaq.serialization.simpleapi.FSTCoder;
 import com.fluent.framework.events.core.*;
 import com.fluent.framework.events.in.FluentInboundEvent;
 import com.fluent.framework.events.out.FluentOutboundEvent;
-import com.fluent.framework.market.core.MarketDataEvent;
 
 import static com.fluent.framework.util.FluentUtil.*;
 
@@ -47,11 +46,22 @@ public final class FluentEventFstPersister implements FluentPersister{
 		return fileName;
 	}
 	
+	
+	public final void register( Class<?> ... clazzes ){
+		
+    	for( Class<?> clazz : clazzes ){
+    		fstCoder.getConf().registerClass( clazz ); 
+    	}
+    
+    	LOGGER.info("Initialized by registering [{}] custom classes, will persist and recover all Input events.", Arrays.deepToString(clazzes) );
+    	
+    }
+	
 
     @Override
     public final void init( ){
-    	fstCoder.getConf().registerClass( FluentEvent.class, FluentInboundEvent.class, FluentOutboundEvent.class, MarketDataEvent.class );
-        LOGGER.info("[{}] initialized, will Persist and recover all Input events.", NAME );
+    	fstCoder.getConf().registerClass( FluentEvent.class, FluentInboundEvent.class, FluentOutboundEvent.class);
+    	LOGGER.info("[{}] initialized, will Persist and recover all Input events.", NAME );
     }
 
     

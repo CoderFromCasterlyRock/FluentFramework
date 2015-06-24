@@ -1,4 +1,4 @@
-package com.fluent.framework.market.core;
+package com.fluent.framework.market;
 
 
 public abstract class Market{

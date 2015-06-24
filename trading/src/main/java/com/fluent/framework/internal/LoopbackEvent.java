@@ -1,7 +1,7 @@
-package com.fluent.framework.events.in;
+package com.fluent.framework.internal;
 
 import com.eclipsesource.json.*;
-import com.fluent.framework.events.core.*;
+import com.fluent.framework.events.in.FluentInboundEvent;
 
 import static com.fluent.framework.events.core.FluentJsonTags.*;
 import static com.fluent.framework.events.in.FluentInboundType.*;

@@ -3,8 +3,7 @@ package com.fluent.framework.persistence;
 import java.io.File;
 import org.HdrHistogram.*;
 
-import com.fluent.framework.market.core.Exchange;
-import com.fluent.framework.market.core.MarketDataEvent;
+import com.fluent.framework.events.in.*;
 
 import static java.util.concurrent.TimeUnit.*;
 
@@ -28,7 +27,7 @@ public class FluentPersisterPerformance{
 						
 			for( int i=0; i< eventCount; i++ ){
 				long startTimeNanos		= System.nanoTime();
-				MarketDataEvent event 	= new MarketDataEvent( Exchange.CME, "EDM6", 99, 1000+i, 100, 1100+i );
+				CustomInternalEvent event = new CustomInternalEvent( i );
 				persister.persist( event );
 				long timeTakenNanos		= System.nanoTime() - startTimeNanos;
 				histogram.recordValue( timeTakenNanos );
