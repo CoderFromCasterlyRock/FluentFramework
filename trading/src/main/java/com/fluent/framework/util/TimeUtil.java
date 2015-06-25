@@ -23,7 +23,11 @@ public final class TimeUtil{
     }
     
     
-    public final static long parseTime( String name, String timeAsString ){
+    public final static long parseTime( String section, String name, String timeAsString ){
+    	
+    	if( timeAsString == null ){
+    		throw new RuntimeException( name + " must be specified under " + section + " as HH:mm:ss." );
+    	}
     	
     	String[] timeTokens 	= timeAsString.trim().split( COLON );
     	if( timeTokens.length < THREE ){

@@ -1,15 +1,11 @@
 package com.fluent.framework.transport.jeromq.transport;
 
 import org.slf4j.*;
-
 import zmq.ZError;
-
 import org.zeromq.*;
 import org.zeromq.ZMQ.*;
-
 import java.util.concurrent.*;
 
-import com.fluent.framework.core.*;
 import com.fluent.framework.util.FluentThreadFactory;
 
 import static com.fluent.framework.util.FluentUtil.*;

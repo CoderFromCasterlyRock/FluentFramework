@@ -8,14 +8,29 @@ import static com.fluent.framework.util.FluentUtil.*;
 public final class FluentContext{
 	
 	
+	public final static String getInstance( ){
+		return Instance.getName();
+	}
 	
-	public enum APP{
+	
+	public final static Region getRegion( ){
+        return Region.getRegion();
+    }
+
+	
+	public final static Environment getEnvironment( ){
+        return Environment.getEnvironment();
+    }
+	
+	
+	
+	public enum Instance{
 	
 		NAME;
 		
 		public static String getName( ){
 
-			String prop		= "fluent.framework.appname";
+			String prop		= "fluent.framework.instance";
 			String name		= System.getProperty( prop );
                 
 			if( isBlank(name) ){
@@ -41,8 +56,9 @@ public final class FluentContext{
 	
 	public enum Region{
     	
-        NA,
-        EMEA;
+        NY,
+        CHI,
+        LON;
 
         public static Region getRegion( ){
             String name     = EMPTY;
@@ -87,30 +103,6 @@ public final class FluentContext{
         }
 
     }
-    
-     
-    public enum Instance{
-        
-    	FLUENT_OUTRIGHT,
-        FLUENT_STRATEGY;
-        
-        public static Instance getInstance( ){
-            String name         = EMPTY;
-            Instance instance   = null;
-            String prop         = "fluent.framework.instance";
-
-            try{
-                name        = System.getProperty( prop );
-                instance    = Instance.valueOf( name );
-
-            }catch( Exception e ){
-                printUsageAndExit( prop, name, Arrays.deepToString( Instance.values() ) );
-            }
-
-            return instance;
-        }
-
-    }
 
     
 	public enum FluentState{
@@ -136,27 +128,6 @@ public final class FluentContext{
 	}
 	
 	
-	public final static String getAppName( ){
-		return APP.getName();
-	}
-	
-	
-	
-	public final static  Region getRegion( ){
-        return Region.getRegion();
-    }
-
-	
-	public final static  Environment getEnvironment( ){
-        return Environment.getEnvironment();
-    }
-
-	
-	public final static  Instance getInstance( ){
-        return Instance.getInstance();
-    }
-
-
     private final static void printUsageAndExit( String propName, String propValue, String choices ){
 
         StringBuilder usage = new StringBuilder( TWO * SIXTY_FOUR );

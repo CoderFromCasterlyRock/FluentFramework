@@ -1,6 +1,7 @@
 package com.fluent.framework.events.in;
 
 import org.HdrHistogram.*;
+
 import java.util.concurrent.*;
 
 import com.fluent.framework.persistence.FluentEventFstPersister;
@@ -47,7 +48,7 @@ public final class InboundDispatcherPerformance{
         Thread.sleep( 2000 );
 
         for( int i = 0; i< eventCount; i++ ){
-        	CustomInternalEvent event = new CustomInternalEvent( i );
+        	InboundWarmupEvent event = new InboundWarmupEvent( );
         	InboundEventDispatcher.enqueue( event );
         	
         	if( System.nanoTime() - event.getCreationTime() < 5000 ){

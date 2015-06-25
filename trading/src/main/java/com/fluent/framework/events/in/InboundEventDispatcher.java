@@ -1,17 +1,13 @@
 package com.fluent.framework.events.in;
 
 import org.slf4j.*;
-
 import java.util.*;
 import java.util.concurrent.*;
-
 import org.jctools.queues.*;
 
 import com.fluent.framework.core.*;
+import com.fluent.framework.util.*;
 import com.fluent.framework.collection.*;
-import com.fluent.framework.events.core.*;
-import com.fluent.framework.internal.InboundWarmupEvent;
-import com.fluent.framework.util.FluentThreadFactory;
 
 import static com.fluent.framework.util.FluentUtil.*;
 
@@ -51,7 +47,7 @@ public final class InboundEventDispatcher implements FluentService, Runnable{
     public final void prime(  ){
     	
     	int warmupSize				= SIXTY_FOUR * DEFAULT_SIZE;
-    	FluentInboundEvent event 	=  new InboundWarmupEvent( );
+    	FluentInboundEvent event 	= new InboundWarmupEvent( );
     	
     	for( int i =ZERO; i < warmupSize; i++ ){
     		QUEUE.offer( event );

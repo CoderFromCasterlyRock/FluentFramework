@@ -2,7 +2,6 @@ package com.fluent.framework.persistence;
 
 import java.io.File;
 import org.HdrHistogram.*;
-
 import com.fluent.framework.events.in.*;
 
 import static java.util.concurrent.TimeUnit.*;
@@ -27,7 +26,7 @@ public class FluentPersisterPerformance{
 						
 			for( int i=0; i< eventCount; i++ ){
 				long startTimeNanos		= System.nanoTime();
-				CustomInternalEvent event = new CustomInternalEvent( i );
+				InboundWarmupEvent event = new InboundWarmupEvent();
 				persister.persist( event );
 				long timeTakenNanos		= System.nanoTime() - startTimeNanos;
 				histogram.recordValue( timeTakenNanos );

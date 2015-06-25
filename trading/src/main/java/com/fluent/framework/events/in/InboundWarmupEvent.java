@@ -1,26 +1,33 @@
-package com.fluent.framework.internal;
+package com.fluent.framework.events.in;
+
+import com.eclipsesource.json.JsonObject;
 
 import static com.fluent.framework.events.in.FluentInboundType.*;
 
 
-public final class InboundWarmupEvent extends InternalEvent{
+public final class InboundWarmupEvent extends FluentInboundEvent{
 	
 	private final String eventId;
 		
 	private final static long serialVersionUID = 1L;
 	private final static String PREFIX			= "Warmup_"; 
 	
-
+	
 	public InboundWarmupEvent( ){
 		super( WARM_UP_EVENT );
 		
-		this.eventId	  	= PREFIX + getSequenceId(); 
+		this.eventId	= PREFIX + getSequenceId(); 
 	}
+	
 	
 	@Override
 	public final String getEventId( ){
 		return eventId;
 	}
+
+	
+	@Override
+	protected final void toJSON( JsonObject object ){}
 	
 
 }

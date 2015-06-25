@@ -12,7 +12,7 @@ import com.fluent.framework.events.in.FluentInboundEvent;
 import com.fluent.framework.events.in.FluentInboundListener;
 import com.fluent.framework.events.in.FluentInboundType;
 import com.fluent.framework.events.in.InboundEventDispatcher;
-import com.fluent.framework.internal.InboundWarmupEvent;
+import com.fluent.framework.events.in.InboundWarmupEvent;
 
 import static com.fluent.framework.util.FluentUtil.*;
 

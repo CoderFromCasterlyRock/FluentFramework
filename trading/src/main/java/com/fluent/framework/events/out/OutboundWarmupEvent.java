@@ -1,7 +1,6 @@
-package com.fluent.framework.internal;
+package com.fluent.framework.events.out;
 
 import com.eclipsesource.json.JsonObject;
-import com.fluent.framework.events.out.FluentOutboundEvent;
 
 import static com.fluent.framework.events.out.FluentOutboundType.*;
 
