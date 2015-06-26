@@ -18,8 +18,8 @@ public final class InboundEventDispatcher implements FluentService, Runnable{
 
     private final ExecutorService executor;
     
-    private final static AbstractQueue<FluentInboundEvent> QUEUE;
-    private final static List<FluentInboundListener> LISTENERS;
+    private final static AbstractQueue<InboundEvent> QUEUE;
+    private final static List<InboundListener> LISTENERS;
     
     private final static int DEFAULT_SIZE   = SIXTY_FOUR * SIXTY_FOUR; 
     private final static String NAME        = InboundEventDispatcher.class.getSimpleName();
@@ -28,7 +28,7 @@ public final class InboundEventDispatcher implements FluentService, Runnable{
     
     static{
     	QUEUE		= new MpscArrayQueue<>( DEFAULT_SIZE );
-    	LISTENERS 	= new CopyOnWriteArrayList<FluentInboundListener>( );
+    	LISTENERS 	= new CopyOnWriteArrayList<InboundListener>( );
     }
     
     
@@ -47,7 +47,7 @@ public final class InboundEventDispatcher implements FluentService, Runnable{
     public final void prime(  ){
     	
     	int warmupSize				= SIXTY_FOUR * DEFAULT_SIZE;
-    	FluentInboundEvent event 	= new InboundWarmupEvent( );
+    	InboundEvent event 	= new InboundWarmupEvent( );
     	
     	for( int i =ZERO; i < warmupSize; i++ ){
     		QUEUE.offer( event );
@@ -74,7 +74,7 @@ public final class InboundEventDispatcher implements FluentService, Runnable{
     }
     
     
-    public final static boolean register( FluentInboundListener listener ){
+    public final static boolean register( InboundListener listener ){
         boolean added = LISTENERS.add( listener );
         LOGGER.debug( "[#{} {}] ADDED as an Inbound event listener.", LISTENERS.size(), listener.name() );
 
@@ -82,7 +82,7 @@ public final class InboundEventDispatcher implements FluentService, Runnable{
     }
 
 
-    public final static boolean deregister( FluentInboundListener listener ){
+    public final static boolean deregister( InboundListener listener ){
         boolean removed = LISTENERS.remove( listener );
         LOGGER.debug( "[#{} {}] REMOVED as an Inbound event listener.", LISTENERS.size(), listener.name() );
         return removed;
@@ -90,7 +90,7 @@ public final class InboundEventDispatcher implements FluentService, Runnable{
   
     
 
-    public final static boolean enqueue( final FluentInboundEvent event ){
+    public final static boolean enqueue( final InboundEvent event ){
         return QUEUE.offer( event );
     }
 
@@ -107,13 +107,13 @@ public final class InboundEventDispatcher implements FluentService, Runnable{
            
         	try{
 
-        		FluentInboundEvent event  = QUEUE.poll( );
+        		InboundEvent event  = QUEUE.poll( );
         		if( event == null  ){
         			FluentBackoffStrategy.apply( ONE );
         			continue;
         		}
 
-        		for( FluentInboundListener listener : LISTENERS ){
+        		for( InboundListener listener : LISTENERS ){
         			if( listener.isSupported(event.getType()) ){
         				listener.update(  event );
         			}

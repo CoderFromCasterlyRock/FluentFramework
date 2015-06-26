@@ -8,9 +8,9 @@ import com.fluent.framework.events.core.*;
 import static com.fluent.framework.util.FluentUtil.*;
 
 
-public final class FluentEventFakePersister implements FluentPersister{
+public final class EventFakePersister implements Persister{
 
-	private final static String NAME		= FluentEventFakePersister.class.getSimpleName();
+	private final static String NAME		= EventFakePersister.class.getSimpleName();
     private final static Logger LOGGER      = LoggerFactory.getLogger( NAME );
 
     

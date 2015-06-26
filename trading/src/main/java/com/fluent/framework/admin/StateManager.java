@@ -9,7 +9,7 @@ import com.fluent.framework.core.*;
 import com.fluent.framework.util.*;
 import com.fluent.framework.core.FluentContext.Environment;
 import com.fluent.framework.core.FluentContext.FluentState;
-import com.fluent.framework.events.in.FluentInboundEvent;
+import com.fluent.framework.events.in.InboundEvent;
 import com.fluent.framework.events.in.InboundEventDispatcher;
 
 import static java.util.concurrent.TimeUnit.*;
@@ -18,7 +18,7 @@ import static com.fluent.framework.core.FluentContext.*;
 import static com.fluent.framework.core.FluentContext.FluentState.*;
 
 
-public final class FluentStateManager implements Runnable, FluentStartable{
+public final class StateManager implements Runnable, FluentStartable{
 
 	private volatile boolean keepRunning;
 	
@@ -31,7 +31,7 @@ public final class FluentStateManager implements Runnable, FluentStartable{
 	
 	private final static int DEFAULT_DELAY		= 5;
 	private final static TimeUnit DEFAULT_UNIT	= SECONDS;
-	private final static String NAME			= FluentStateManager.class.getSimpleName();
+	private final static String NAME			= StateManager.class.getSimpleName();
     private final static Logger LOGGER     		= LoggerFactory.getLogger( NAME );
 
     
@@ -40,12 +40,12 @@ public final class FluentStateManager implements Runnable, FluentStartable{
     }
 
     
-    public FluentStateManager( FluentConfiguration config ){
+    public StateManager( FluentConfiguration config ){
     	this( DEFAULT_DELAY, DEFAULT_UNIT, config );
     }
     
     
-    public FluentStateManager( int delay, TimeUnit unit, FluentConfiguration config ){
+    public StateManager( int delay, TimeUnit unit, FluentConfiguration config ){
     	
     	this.delay	 	= delay;
     	this.unit		= unit;
@@ -83,7 +83,7 @@ public final class FluentStateManager implements Runnable, FluentStartable{
 	
 	protected final void sendMetronomeEvent( ){
 		long secondsToClose		 = getSecondsToClose( );
-		FluentInboundEvent metro = new MetronomeEvent( secondsToClose );
+		InboundEvent metro = new MetronomeEvent( secondsToClose );
 		
 		InboundEventDispatcher.enqueue( metro );
 	}

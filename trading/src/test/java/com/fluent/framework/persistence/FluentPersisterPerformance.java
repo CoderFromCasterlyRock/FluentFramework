@@ -12,7 +12,7 @@ public class FluentPersisterPerformance{
 	
 	public static void main( String[] args ){
 
-		FluentPersister persister = null;
+		Persister persister = null;
 		
 		try{
 			
@@ -21,7 +21,7 @@ public class FluentPersisterPerformance{
 			long totalSizeBytes 	= eventCount * size1ObjBytes;
 			String fileLocation		= "C:\\Temp";
 			Histogram histogram		= new Histogram( NANOSECONDS.convert(1, SECONDS), 2);
-			persister				= new FluentEventFstPersister(fileLocation, "", "Test", totalSizeBytes, eventCount );
+			persister				= new EventFstPersister(fileLocation, "", "Test", totalSizeBytes, eventCount );
 			persister.init();
 						
 			for( int i=0; i< eventCount; i++ ){

@@ -3,27 +3,29 @@ package com.fluent.framework.transport.core;
 import java.util.*;
 import java.util.concurrent.*;
 
+import com.fluent.framework.events.core.FluentDataListener;
 
-public abstract class FluentAbstractTransport implements FluentTransport{
 
-	private final FluentTransportType transportType;
-	private final AbstractSet<FluentTransportListener> listeners;
+public abstract class AbstractTransport implements Transport{
+
+	private final TransportType transportType;
+	private final AbstractSet<FluentDataListener> listeners;
 	
 	
-	public FluentAbstractTransport( FluentTransportType transportType ){
+	public AbstractTransport( TransportType transportType ){
 		this.transportType 	= transportType;
 		this.listeners		= new CopyOnWriteArraySet<>(); 
 	}
 	
 	
 	@Override
-	public final FluentTransportType getType( ){
+	public final TransportType getType( ){
 		return transportType;
 	}
 
 	
 	@Override
-	public final boolean register( FluentTransportListener listener ){
+	public final boolean register( FluentDataListener listener ){
 		if( listener == null ) return false;
 		
 		return listeners.add( listener );
@@ -31,7 +33,7 @@ public abstract class FluentAbstractTransport implements FluentTransport{
 
 		
 	@Override
-	public final boolean deregister( FluentTransportListener listener ){
+	public final boolean deregister( FluentDataListener listener ){
 		if( listener == null ) return false;
 		
 		return listeners.remove( listener );
@@ -39,7 +41,7 @@ public abstract class FluentAbstractTransport implements FluentTransport{
 	
 	
 	protected final void distribute( String message ){
-		for( FluentTransportListener listener : listeners ){
+		for( FluentDataListener listener : listeners ){
 			listener.onMessage( message );
 		}
 	}

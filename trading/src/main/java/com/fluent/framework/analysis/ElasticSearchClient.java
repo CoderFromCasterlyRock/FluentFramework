@@ -8,9 +8,9 @@ import java.util.concurrent.*;
 import com.fluent.framework.core.*;
 import com.fluent.framework.events.core.*;
 import com.fluent.framework.events.in.*;
-import com.fluent.framework.events.out.FluentOutboundEvent;
-import com.fluent.framework.events.out.FluentOutboundListener;
-import com.fluent.framework.events.out.FluentOutboundType;
+import com.fluent.framework.events.out.OutboundEvent;
+import com.fluent.framework.events.out.OutboundListener;
+import com.fluent.framework.events.out.OutboundType;
 import com.fluent.framework.events.out.OutboundEventDispatcher;
 import com.fluent.framework.util.FluentThreadFactory;
 import com.fluent.framework.collection.*;
@@ -26,7 +26,7 @@ import static com.fluent.framework.util.TimeUtil.*;
 import static com.fluent.framework.util.FluentUtil.*;
 
 
-public final class FluentElasticSearchClient implements Runnable, FluentInboundListener, FluentOutboundListener, FluentStartable{
+public final class ElasticSearchClient implements Runnable, InboundListener, OutboundListener, FluentStartable{
 
 	private volatile boolean isRunning;
 	
@@ -43,12 +43,12 @@ public final class FluentElasticSearchClient implements Runnable, FluentInboundL
     
     private final static String DEFAULT_INDEX_PREFIX    = "Fluent-";
     private final static String DEFAULT_INDEX_SUFFIX	= "-" + TODAY;
-    private final static String NAME    				= FluentElasticSearchClient.class.getSimpleName();
+    private final static String NAME    				= ElasticSearchClient.class.getSimpleName();
     private final static Logger LOGGER  				= LoggerFactory.getLogger( NAME );
 
 
 
-    public FluentElasticSearchClient( String indexName, String clusterName, String hostName, int portNumber ){
+    public ElasticSearchClient( String indexName, String clusterName, String hostName, int portNumber ){
 		
     	this.indexName      = indexName;
         this.clusterName	= clusterName;
@@ -83,26 +83,26 @@ public final class FluentElasticSearchClient implements Runnable, FluentInboundL
     
     
     @Override
-    public final boolean isSupported( FluentInboundType type ){
+    public final boolean isSupported( InboundType type ){
 		return true;
 	}
     
     
     @Override
-    public final boolean isSupported( FluentOutboundType type ){
+    public final boolean isSupported( OutboundType type ){
 		return true;
 	}
     
     
     @Override
-	public final boolean update( FluentInboundEvent event ){
+	public final boolean update( InboundEvent event ){
 		if( !isRunning ) return false;
 		
 		return queue.offer( event );
 	}
 	
 	@Override
-	public final boolean update( FluentOutboundEvent event ){
+	public final boolean update( OutboundEvent event ){
 		if( !isRunning ) return false;
 		
 		return queue.offer( event );

@@ -2,10 +2,10 @@ package com.fluent.framework.events.in;
 
 import com.eclipsesource.json.JsonObject;
 
-import static com.fluent.framework.events.in.FluentInboundType.*;
+import static com.fluent.framework.events.in.InboundType.*;
 
 
-public final class InboundWarmupEvent extends FluentInboundEvent{
+public final class InboundWarmupEvent extends InboundEvent{
 	
 	private final String eventId;
 		

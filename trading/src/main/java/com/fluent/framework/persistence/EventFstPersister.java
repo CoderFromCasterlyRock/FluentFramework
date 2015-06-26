@@ -8,13 +8,13 @@ import org.nustaq.serialization.simpleapi.DefaultCoder;
 import org.nustaq.serialization.simpleapi.FSTCoder;
 
 import com.fluent.framework.events.core.*;
-import com.fluent.framework.events.in.FluentInboundEvent;
-import com.fluent.framework.events.out.FluentOutboundEvent;
+import com.fluent.framework.events.in.InboundEvent;
+import com.fluent.framework.events.out.OutboundEvent;
 
 import static com.fluent.framework.util.FluentUtil.*;
 
 
-public final class FluentEventFstPersister implements FluentPersister{
+public final class EventFstPersister implements Persister{
 
 	private final String fileName;
 	private final int eventCount;
@@ -26,7 +26,7 @@ public final class FluentEventFstPersister implements FluentPersister{
     private final static Logger LOGGER      	= LoggerFactory.getLogger( NAME );
 
 
-    public FluentEventFstPersister( String location, String instanceName, String journal, long totalSizeBytes, int eventCount ){
+    public EventFstPersister( String location, String instanceName, String journal, long totalSizeBytes, int eventCount ){
     	
     	this.fileName 		= createMMFile( location, instanceName, journal );
     	this.eventCount 	= eventCount;
@@ -60,7 +60,7 @@ public final class FluentEventFstPersister implements FluentPersister{
 
     @Override
     public final void init( ){
-    	fstCoder.getConf().registerClass( FluentEvent.class, FluentInboundEvent.class, FluentOutboundEvent.class);
+    	fstCoder.getConf().registerClass( FluentEvent.class, InboundEvent.class, OutboundEvent.class);
     	LOGGER.info("[{}] initialized, will Persist and recover all Input events.", NAME );
     }
 

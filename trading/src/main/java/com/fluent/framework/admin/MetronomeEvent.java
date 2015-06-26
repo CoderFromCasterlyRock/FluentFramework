@@ -1,13 +1,13 @@
 package com.fluent.framework.admin;
 
 import com.eclipsesource.json.JsonObject;
-import com.fluent.framework.events.in.FluentInboundEvent;
+import com.fluent.framework.events.in.InboundEvent;
 
-import static com.fluent.framework.events.in.FluentInboundType.*;
+import static com.fluent.framework.events.in.InboundType.*;
 
 
 
-public final class MetronomeEvent extends FluentInboundEvent{
+public final class MetronomeEvent extends InboundEvent{
 	
 	private final String eventId;
 	private final long secondsToClose;

@@ -1,10 +1,10 @@
 package com.fluent.framework.admin;
 
-import com.fluent.framework.events.in.FluentInboundEvent;
-import com.fluent.framework.events.in.FluentInboundType;
+import com.fluent.framework.events.in.InboundEvent;
+import com.fluent.framework.events.in.InboundType;
 
 
-public abstract class AdminEvent extends FluentInboundEvent{
+public abstract class AdminEvent extends InboundEvent{
 
 	private final String message;
 	private final String eventId;
@@ -12,7 +12,7 @@ public abstract class AdminEvent extends FluentInboundEvent{
 	private final static String PREFIX = "Admin_";
 	private final static long serialVersionUID = 1l;
 	
-	public AdminEvent( FluentInboundType type, String message ){
+	public AdminEvent( InboundType type, String message ){
 	    super( type );
 
 	    this.message	= message;

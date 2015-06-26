@@ -18,8 +18,8 @@ public final class OutboundEventDispatcher implements FluentService, Runnable{
     private volatile boolean keepDispatching;
 
     private final ExecutorService executor;
-    private final static AbstractQueue<FluentOutboundEvent> QUEUE;
-    private final static List<FluentOutboundListener> LISTENERS;
+    private final static AbstractQueue<OutboundEvent> QUEUE;
+    private final static List<OutboundListener> LISTENERS;
     
     private final static int DEFAULT_SIZE   = SIXTY_FOUR * SIXTY_FOUR; 
     private final static String NAME        = OutboundEventDispatcher.class.getSimpleName();
@@ -28,7 +28,7 @@ public final class OutboundEventDispatcher implements FluentService, Runnable{
     
     static{
     	QUEUE      	= new MpscArrayQueue<>( DEFAULT_SIZE );
-    	LISTENERS	= new CopyOnWriteArrayList<FluentOutboundListener>( );
+    	LISTENERS	= new CopyOnWriteArrayList<OutboundListener>( );
     }
     
         
@@ -47,7 +47,7 @@ public final class OutboundEventDispatcher implements FluentService, Runnable{
     public final void prime( ){
     	
     	int warmupSize				= SIXTY_FOUR * DEFAULT_SIZE;
-    	FluentOutboundEvent event 	= new OutboundWarmupEvent( );
+    	OutboundEvent event 	= new OutboundWarmupEvent( );
     	
     	for( int i =ZERO; i <( SIXTY_FOUR * DEFAULT_SIZE); i++ ){
     		QUEUE.offer( event );
@@ -74,7 +74,7 @@ public final class OutboundEventDispatcher implements FluentService, Runnable{
     }
     
     
-    public final static boolean register( FluentOutboundListener listener ){
+    public final static boolean register( OutboundListener listener ){
         boolean added = LISTENERS.add( listener );
         LOGGER.debug( "[#{} {}] ADDED as an Outbound event listener.", LISTENERS.size(), listener.name() );
 
@@ -82,7 +82,7 @@ public final class OutboundEventDispatcher implements FluentService, Runnable{
     }
 
 
-    public final static boolean deregister( FluentInboundListener listener ){
+    public final static boolean deregister( InboundListener listener ){
         boolean removed = LISTENERS.remove( listener );
         LOGGER.debug( "[#{} {}] REMOVED as an Outbound event listener.", LISTENERS.size(), listener.name() );
         return removed;
@@ -90,7 +90,7 @@ public final class OutboundEventDispatcher implements FluentService, Runnable{
   
     
 
-    public final static boolean enqueue( final FluentOutboundEvent event ){
+    public final static boolean enqueue( final OutboundEvent event ){
         return QUEUE.offer( event );
     }
 
@@ -108,13 +108,13 @@ public final class OutboundEventDispatcher implements FluentService, Runnable{
            
         	try{
 
-        		FluentOutboundEvent event  = QUEUE.poll( );
+        		OutboundEvent event  = QUEUE.poll( );
         		if( event == null  ){
         			FluentBackoffStrategy.apply( ONE );
         			continue;
         		}
 
-        		for( FluentOutboundListener listener : LISTENERS ){
+        		for( OutboundListener listener : LISTENERS ){
         			if( listener.isSupported(event.getType()) ){
         				listener.update(  event );
         			}

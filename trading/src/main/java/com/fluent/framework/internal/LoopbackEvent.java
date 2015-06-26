@@ -1,24 +1,24 @@
 package com.fluent.framework.internal;
 
 import com.eclipsesource.json.*;
-import com.fluent.framework.events.in.FluentInboundEvent;
+import com.fluent.framework.events.in.InboundEvent;
 
 import static com.fluent.framework.events.core.FluentJsonTags.*;
-import static com.fluent.framework.events.in.FluentInboundType.*;
+import static com.fluent.framework.events.in.InboundType.*;
 
 
 
-public final class LoopbackEvent extends FluentInboundEvent{
+public final class LoopbackEvent extends InboundEvent{
 
 	private final boolean isValid;
     private final String reason;
     private final String eventId;
-    private final FluentInboundEvent event;
+    private final InboundEvent event;
 
     private final static String PREFIX = "LOOPBACK_";
     private final static long serialVersionUID = 1l;
     
-    public LoopbackEvent( boolean isValid, FluentInboundEvent event, String reason ){
+    public LoopbackEvent( boolean isValid, InboundEvent event, String reason ){
         super( LOOPBACK_EVENT );
 
         this.isValid	= isValid;
@@ -45,7 +45,7 @@ public final class LoopbackEvent extends FluentInboundEvent{
     }
 
 
-    public final FluentInboundEvent getLoopbackEvent( ){
+    public final InboundEvent getLoopbackEvent( ){
         return event;
     }
 

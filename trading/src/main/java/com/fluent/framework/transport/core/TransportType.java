@@ -1,6 +1,6 @@
 package com.fluent.framework.transport.core;
 
-public enum FluentTransportType{
+public enum TransportType{
 	
 	FILE,
 	SOCKET,

@@ -13,7 +13,7 @@ import com.fluent.framework.util.FluentThreadFactory;
 import static com.fluent.framework.util.FluentUtil.*;
 
 
-public final class FileMarketDataTransport extends FluentAbstractTransport implements Runnable{
+public final class FileMarketDataTransport extends AbstractTransport implements Runnable{
 
 	private volatile int index;
 	
@@ -28,7 +28,7 @@ public final class FileMarketDataTransport extends FluentAbstractTransport imple
 
 	
 	public FileMarketDataTransport( String fileLocation, int frequency, TimeUnit timeUnit ){
-		super( FluentTransportType.FILE );
+		super( TransportType.FILE );
 		
 		this.fileLocation 	= fileLocation;
 		this.frequency		= frequency;

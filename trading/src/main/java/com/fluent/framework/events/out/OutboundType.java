@@ -8,7 +8,7 @@ import com.fluent.framework.events.core.FluentEventType;
 import static com.fluent.framework.events.core.FluentEventCategory.*;
 
 
-public enum FluentOutboundType implements FluentEventType{
+public enum OutboundType implements FluentEventType{
 
 	WARM_UP_EVENT		( FROM_INTERNAL_CATEGORY ),
     ORDER_TO_MARKET     ( TO_MARKET_CATEGORY	),
@@ -17,15 +17,15 @@ public enum FluentOutboundType implements FluentEventType{
 
     private final FluentEventCategory category;
 
-    private final static Set<FluentOutboundType> ALL_TYPES;
+    private final static Set<OutboundType> ALL_TYPES;
    
 
     static{
-    	ALL_TYPES = new HashSet<FluentOutboundType>(Arrays.asList(FluentOutboundType.values()));
+    	ALL_TYPES = new HashSet<OutboundType>(Arrays.asList(OutboundType.values()));
     }
 
 
-    FluentOutboundType( FluentEventCategory category ){
+    OutboundType( FluentEventCategory category ){
         this.category       = category;
     }
 
@@ -42,7 +42,7 @@ public enum FluentOutboundType implements FluentEventType{
     }
 
     
-    public final static Set<FluentOutboundType> allTypes( ){
+    public final static Set<OutboundType> allTypes( ){
         return ALL_TYPES;
     }
 

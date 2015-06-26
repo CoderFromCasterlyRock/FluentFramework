@@ -8,7 +8,7 @@ import com.fluent.framework.events.core.FluentEventType;
 import static com.fluent.framework.events.core.FluentEventCategory.*;
 
 
-public enum FluentInboundType implements FluentEventType{
+public enum InboundType implements FluentEventType{
 
    
 	NEW_STRATEGY				( FROM_TRADER_CATEGORY ),
@@ -34,14 +34,14 @@ public enum FluentInboundType implements FluentEventType{
 
     private final FluentEventCategory category;
    
-    private final static Set<FluentInboundType> ALL_TYPES;
+    private final static Set<InboundType> ALL_TYPES;
     
     static{
-    	ALL_TYPES = new HashSet<FluentInboundType>(Arrays.asList(FluentInboundType.values()));
+    	ALL_TYPES = new HashSet<InboundType>(Arrays.asList(InboundType.values()));
     }
     
 
-    FluentInboundType( FluentEventCategory category ){
+    InboundType( FluentEventCategory category ){
         this.category       = category;
     }
 
@@ -57,7 +57,7 @@ public enum FluentInboundType implements FluentEventType{
     }
 
     
-    public final static Set<FluentInboundType> allTypes( ){
+    public final static Set<InboundType> allTypes( ){
         return ALL_TYPES;
     }
     

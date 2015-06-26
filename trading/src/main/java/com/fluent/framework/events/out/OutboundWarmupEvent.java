@@ -2,10 +2,10 @@ package com.fluent.framework.events.out;
 
 import com.eclipsesource.json.JsonObject;
 
-import static com.fluent.framework.events.out.FluentOutboundType.*;
+import static com.fluent.framework.events.out.OutboundType.*;
 
 
-public final class OutboundWarmupEvent extends FluentOutboundEvent{
+public final class OutboundWarmupEvent extends OutboundEvent{
 	
 	private final String eventId;
 		

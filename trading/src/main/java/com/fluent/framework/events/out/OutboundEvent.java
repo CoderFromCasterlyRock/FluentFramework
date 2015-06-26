@@ -4,19 +4,19 @@ import com.fluent.framework.events.core.FluentEvent;
 
 
 
-public abstract class FluentOutboundEvent extends FluentEvent{
+public abstract class OutboundEvent extends FluentEvent{
 
-    private final FluentOutboundType type;
+    private final OutboundType type;
 
     private final static long serialVersionUID = 1l;
      
-    public FluentOutboundEvent( FluentOutboundType type ){
+    public OutboundEvent( OutboundType type ){
     	this.type   = type;    	
     }
     
     
     @Override
-    public final FluentOutboundType getType( ){
+    public final OutboundType getType( ){
         return type;
     }
 

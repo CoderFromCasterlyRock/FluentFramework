@@ -8,21 +8,21 @@ import java.util.concurrent.*;
 import com.fluent.framework.core.*;
 import com.fluent.framework.collection.*;
 import com.fluent.framework.events.core.*;
-import com.fluent.framework.events.in.FluentInboundEvent;
-import com.fluent.framework.events.in.FluentInboundListener;
-import com.fluent.framework.events.in.FluentInboundType;
+import com.fluent.framework.events.in.InboundEvent;
+import com.fluent.framework.events.in.InboundListener;
+import com.fluent.framework.events.in.InboundType;
 import com.fluent.framework.events.in.InboundEventDispatcher;
 import com.fluent.framework.events.in.InboundWarmupEvent;
 
 import static com.fluent.framework.util.FluentUtil.*;
 
 
-public final class InboundEventPersisterService implements Runnable, FluentService, FluentInboundListener{
+public final class InboundEventPersisterService implements Runnable, FluentService, InboundListener{
 
 	private volatile boolean keepDispatching;
 	
 	private final int eventCount;
-	private final FluentPersister persister;
+	private final Persister persister;
 	private final ThreadPoolExecutor service;
 	private final SpscArrayQueue<FluentEvent> eventQueue;
 		
@@ -30,7 +30,7 @@ public final class InboundEventPersisterService implements Runnable, FluentServi
     private final static Logger LOGGER     	= LoggerFactory.getLogger( NAME );
 
 
-    public InboundEventPersisterService( int eventCount, FluentPersister persister ){
+    public InboundEventPersisterService( int eventCount, Persister persister ){
     	
     	this.eventCount 	= eventCount;
     	this.persister 		= persister;
@@ -47,7 +47,7 @@ public final class InboundEventPersisterService implements Runnable, FluentServi
 
 	
 	@Override
-	public final boolean isSupported( FluentInboundType type ){
+	public final boolean isSupported( InboundType type ){
 		return true;
 	}
 	
@@ -55,7 +55,7 @@ public final class InboundEventPersisterService implements Runnable, FluentServi
 	@Override
 	public final void prime( ){
 	    	
-		FluentInboundEvent event = new InboundWarmupEvent();
+		InboundEvent event = new InboundWarmupEvent();
 		
     	for( int i =ZERO; i <( TWO * eventCount); i++ ){
     		eventQueue.offer( event );
@@ -83,7 +83,7 @@ public final class InboundEventPersisterService implements Runnable, FluentServi
 
     
     @Override
-    public final boolean update( FluentInboundEvent event ){
+    public final boolean update( InboundEvent event ){
 		return eventQueue.offer( event );
     }
     

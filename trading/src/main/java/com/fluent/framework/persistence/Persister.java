@@ -6,7 +6,7 @@ import com.fluent.framework.core.*;
 import com.fluent.framework.events.core.*;
 
 
-public interface FluentPersister extends FluentStartable{
+public interface Persister extends FluentStartable{
 
 	public String getFileName();
 	public void persist( FluentEvent event );

@@ -4,11 +4,11 @@ import org.HdrHistogram.*;
 
 import java.util.concurrent.*;
 
-import com.fluent.framework.persistence.FluentEventFstPersister;
+import com.fluent.framework.persistence.EventFstPersister;
 import com.fluent.framework.persistence.InboundEventPersisterService;
-import com.fluent.framework.events.in.FluentInboundEvent;
-import com.fluent.framework.events.in.FluentInboundListener;
-import com.fluent.framework.events.in.FluentInboundType;
+import com.fluent.framework.events.in.InboundEvent;
+import com.fluent.framework.events.in.InboundListener;
+import com.fluent.framework.events.in.InboundType;
 import com.fluent.framework.events.in.InboundEventDispatcher;
 
 
@@ -27,7 +27,7 @@ public final class InboundDispatcherPerformance{
         
         InboundEventDispatcher dispatch	= new InboundEventDispatcher( );
         
-        InboundEventPersisterService l1 = new InboundEventPersisterService( eventCount, new FluentEventFstPersister( fileLocation, "", journalName, expectedMemory, eventCount ) );
+        InboundEventPersisterService l1 = new InboundEventPersisterService( eventCount, new EventFstPersister( fileLocation, "", journalName, expectedMemory, eventCount ) );
         InboundEventDispatcher.register( l1 );
         
         DummyListener l2		        = new DummyListener( );
@@ -76,7 +76,7 @@ public final class InboundDispatcherPerformance{
 
 
     
-    public static class DummyListener implements FluentInboundListener{
+    public static class DummyListener implements InboundListener{
 
     	private final Histogram histogram;
     	
@@ -92,13 +92,13 @@ public final class InboundDispatcherPerformance{
 
 
 		@Override
-		public final boolean isSupported(FluentInboundType type) {
+		public final boolean isSupported(InboundType type) {
 			return true;
 		}
         
 		
 		@Override
-		public final boolean update( FluentInboundEvent event ){
+		public final boolean update( InboundEvent event ){
 			if( warmingUp ) return false;
 			
         	histogram.recordValue( (System.nanoTime() - event.getCreationTime()) );
