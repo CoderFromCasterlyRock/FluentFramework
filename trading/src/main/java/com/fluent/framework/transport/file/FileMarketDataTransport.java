@@ -1,9 +1,7 @@
 package com.fluent.framework.transport.file;
 
 import java.io.*;
-
 import org.slf4j.*;
-
 import java.util.*;
 import java.util.concurrent.*;
 

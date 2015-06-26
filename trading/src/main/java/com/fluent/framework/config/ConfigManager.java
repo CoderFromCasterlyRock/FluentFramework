@@ -2,6 +2,7 @@ package com.fluent.framework.config;
 
 import java.io.*;
 import org.ini4j.*;
+import org.ini4j.Profile.Section;
 
 import com.fluent.framework.core.FluentContext;
 import com.fluent.framework.core.FluentContext.*;
@@ -10,7 +11,7 @@ import com.fluent.framework.util.TimeUtil;
 import static com.fluent.framework.util.FluentUtil.*;
 
 
-public abstract class FluentConfiguration{
+public abstract class ConfigManager{
 	
 	private final Region region;
 	private final Environment environment;
@@ -33,7 +34,7 @@ public abstract class FluentConfiguration{
 	private final static String CONFIG_SUFFIX		= ".ini";
 	
 	
-	public FluentConfiguration( ){
+	public ConfigManager( ){
 	
 		this.region 			= Region.getRegion( );
 		this.environment		= Environment.getEnvironment();
@@ -103,6 +104,11 @@ public abstract class FluentConfiguration{
 	
 	protected final Wini getWiniConfig( ){
 		return winiConfig;
+	}
+	
+	
+	protected final Section parseSection( String section ){
+		return winiConfig.get( section );
 	}
 	
 	

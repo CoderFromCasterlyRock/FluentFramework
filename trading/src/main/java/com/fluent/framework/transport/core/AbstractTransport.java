@@ -8,19 +8,19 @@ import com.fluent.framework.events.core.FluentDataListener;
 
 public abstract class AbstractTransport implements Transport{
 
-	private final TransportType transportType;
+	private final TransportType type;
 	private final AbstractSet<FluentDataListener> listeners;
 	
 	
-	public AbstractTransport( TransportType transportType ){
-		this.transportType 	= transportType;
-		this.listeners		= new CopyOnWriteArraySet<>(); 
+	public AbstractTransport( TransportType type ){
+		this.type 		= type;
+		this.listeners	= new CopyOnWriteArraySet<>(); 
 	}
 	
 	
 	@Override
 	public final TransportType getType( ){
-		return transportType;
+		return type;
 	}
 
 	

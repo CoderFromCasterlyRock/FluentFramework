@@ -5,17 +5,14 @@ public enum Exchange{
 
     BTEC                ( false ),
     ESPEED              ( false	),
-    VMO                 ( true, 	BTEC, ESPEED ),
-    CASH_SMART_ROUTER   ( false, 	BTEC, ESPEED),
+    CASH_SMART_ROUTER   ( true, 	BTEC, ESPEED),
 
     CME                 ( false	),
-    CBOT                ( false	),
-    LIFFE               ( false	),
-
+    
     ISWAP               ( false	),
     DWEB                ( false	),
     TRADITION           ( false	),
-    SWAP_SMART_ROUTER   ( false, ISWAP, DWEB, TRADITION ),
+    SWAP_SMART_ROUTER   ( true, ISWAP, DWEB, TRADITION ),
     
     UNSUPPORTED         ( false );
 

@@ -24,7 +24,7 @@ public final class StateManager implements Runnable, FluentStartable{
 	
 	private final int delay;
 	private final TimeUnit unit;
-	private final FluentConfiguration config;
+	private final ConfigManager config;
 	private final ScheduledExecutorService service;
 		
 	private final static AtomicReference<FluentState> APP_STATE;
@@ -40,12 +40,12 @@ public final class StateManager implements Runnable, FluentStartable{
     }
 
     
-    public StateManager( FluentConfiguration config ){
+    public StateManager( ConfigManager config ){
     	this( DEFAULT_DELAY, DEFAULT_UNIT, config );
     }
     
     
-    public StateManager( int delay, TimeUnit unit, FluentConfiguration config ){
+    public StateManager( int delay, TimeUnit unit, ConfigManager config ){
     	
     	this.delay	 	= delay;
     	this.unit		= unit;

@@ -1,4 +1,3 @@
-
 4. Recovery when the container restarts!
 Check if logic to set EventId is incorrect.
 Check if which input/output events should be played in.
@@ -7,17 +6,30 @@ Check if which input/output events should be played in.
 And how do we send input and output events to the chronicle for logging?
 ( what should be the structure of the ResponeEvent)
 
-1. Set up TCP replication of logs for Chronicle.
-All the input and output events will be stored and replicated.
-Only use those MarketData events which are tested (used or unused) by a Strategy.
-
 2. Using fake market data, set up aggregation and smart order routing.
 
 3. Should StrategyManager also have reference to outbound dispatcher (it needs it to signal errors).
 Or should we have a responseManager which will have reference to outbound dispatcher.
 Strategy and StrategyManger can use its static method to send out Trader Updates?
 
-
 ==================================================
 1. Set up ElasticSearch/Kibana and set up dashboard to track an Order.
 
+
+==================================================
+
+Transport class:
+	1) Responsible for connecting to the underlying class specified by the Type.
+	2) Has a list of listeners (FluentDataListener generally implementd by the adaptor), to which it sends messages as it receives.
+
+
+Adaptor class:
+	1) gets data from Transport and converts it to Event usign a decoder.
+	2) Sends events out via the manager.
+	
+
+Manager class:
+	1) Reads and stores relevants properties.
+	2) creates Transport and adaptor and binds them
+	3) Registers listenrs for events and forards them to adaptor
+	4) gets events from Adaptor and sends to dispatcher
