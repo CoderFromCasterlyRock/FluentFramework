@@ -1,6 +1,7 @@
 package com.fluent.framework.util;
 
-import java.io.File;
+import java.io.*;
+import java.util.*;
 import java.lang.management.*;
 import java.net.InetAddress;
 
@@ -24,6 +25,7 @@ public final class FluentUtil{
     public static final int THOUSAND            = 1000;
     public static final int NEGATIVE_ONE        = -1;
 
+    public static final char COLON_CHAR         = ':';
     public static final byte[] EMPTY_BYTE       = {};
 
     public static final double ZERO_DOUBLE      = 0.0d;
@@ -63,22 +65,16 @@ public final class FluentUtil{
         return ( data == null || data.isEmpty() ) ? true : false;
     }
 
+    
+    public final static String toUpper( String data ){
+        return isBlank(data) ? EMPTY : data.trim().toUpperCase();
+    }
+    
+    
     public final static int findNextPositivePowerOfTwo( final int value ){
         return 1 << (32 - Integer.numberOfLeadingZeros(value - 1));
     }
 
-
-    public final static int getRoundedTickDifference( double pivotPrice, double newPrice, double minPriceTick ){
-
-        double priceDifference      = ( newPrice - pivotPrice );
-        double tickDifference       = ( priceDifference / minPriceTick );
-        double tickDifferenceAdj    = ( tickDifference >= ZERO ) ? (tickDifference + PRICE_TOLERANCE) : (tickDifference - PRICE_TOLERANCE);
-        int roundedTickDifference   = (int) tickDifferenceAdj;
-
-        return roundedTickDifference;
-
-    }
-    
     
     public final static int parseInteger( String value ){
 		return isBlank(value) ? 0 : Integer.parseInt(value);
@@ -117,6 +113,32 @@ public final class FluentUtil{
     
     public final static String padLeft( final String number, final int space ){
         return String.format("%1$" + space + "s", String.valueOf(number) );
+    }
+      
+    
+    public static List<String> fastSplit( String text, char separator ){
+        
+    	final List<String> result = new ArrayList<String>();
+        
+        if( text != null && text.length() > ZERO ){
+            
+        	int index1 = ZERO;
+            int index2 = text.indexOf(separator);
+            
+            while (index2 >= ZERO) {
+                String token = text.substring(index1, index2);
+                result.add(token);
+                index1 = index2 + ONE;
+                index2 = text.indexOf(separator, index1);
+            }
+            
+            if (index1 < text.length() - ONE) {
+                result.add(text.substring(index1));
+            }
+        }//else: input unavailable
+        
+        return result;
+    
     }
     
     

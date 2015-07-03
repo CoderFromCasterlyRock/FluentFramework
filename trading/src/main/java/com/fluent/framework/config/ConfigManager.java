@@ -1,12 +1,9 @@
 package com.fluent.framework.config;
 
-import java.io.*;
-import org.ini4j.*;
-import org.ini4j.Profile.Section;
-
-import com.fluent.framework.core.FluentContext;
+import com.typesafe.config.*;
+import com.fluent.framework.util.*;
+import com.fluent.framework.core.*;
 import com.fluent.framework.core.FluentContext.*;
-import com.fluent.framework.util.TimeUtil;
 
 import static com.fluent.framework.util.FluentUtil.*;
 
@@ -17,7 +14,7 @@ public abstract class ConfigManager{
 	private final Environment environment;
 	private final String instance;
 	private final String configFileName;
-	private final Wini winiConfig; 
+	private final Config configuration; 
 	
 	private final String appName;
 	private final String appRawOpenTime;
@@ -25,13 +22,17 @@ public abstract class ConfigManager{
 	private final String appRawCloseTime;
 	private final long appCloseTime;
 	private final String workingHours;
+	private final String appTimeZone;
 	
-	private final static String CORE_SECTION_KEY	= "core";;
-	private final static String APP_NAME_KEY		= "appName";
-	private final static String APP_OPEN_TIME_KEY	= "openTime";
-	private final static String APP_CLOSE_TIME_KEY	= "closeTime";
+	protected final static String APP_SECTION_KEY		= "fluent.";
+	private final static String CORE_SECTION_KEY	= APP_SECTION_KEY + "core.";
+	private final static String APP_NAME_KEY		= CORE_SECTION_KEY + "appName";
+	private final static String APP_OPEN_TIME_KEY	= CORE_SECTION_KEY + "openTime";
+	private final static String APP_CLOSE_TIME_KEY	= CORE_SECTION_KEY + "closeTime";
+	private final static String APP_TIMEZONE_KEY	= CORE_SECTION_KEY + "timeZone";
+	
 	private final static String CONFIG_PREFIX		= "../config/";
-	private final static String CONFIG_SUFFIX		= ".ini";
+	private final static String CONFIG_SUFFIX		= ".conf";
 	
 	
 	public ConfigManager( ){
@@ -40,12 +41,13 @@ public abstract class ConfigManager{
 		this.environment		= Environment.getEnvironment();
 		this.instance			= FluentContext.getInstance( );
 		this.configFileName		= createConfigFileName( );
-		this.winiConfig			= loadConfigs( configFileName ); 
-		this.appName			= parseSection( CORE_SECTION_KEY, APP_NAME_KEY );
+		this.configuration		= loadConfigs( configFileName ); 
+		this.appName			= configuration.getString( APP_NAME_KEY );
+		this.appTimeZone		= configuration.getString( APP_TIMEZONE_KEY );
 		
-		this.appRawOpenTime		= parseSection( CORE_SECTION_KEY, APP_OPEN_TIME_KEY );
+		this.appRawOpenTime		= configuration.getString( APP_OPEN_TIME_KEY );
 		this.appOpenTime		= TimeUtil.parseTime( CORE_SECTION_KEY, APP_OPEN_TIME_KEY, appRawOpenTime );
-		this.appRawCloseTime	= parseSection( CORE_SECTION_KEY, APP_CLOSE_TIME_KEY );
+		this.appRawCloseTime	= configuration.getString( APP_CLOSE_TIME_KEY );
 		this.appCloseTime		= TimeUtil.parseTime( CORE_SECTION_KEY, APP_CLOSE_TIME_KEY, appRawCloseTime );
 		this.workingHours		= appRawOpenTime + DASH + appRawCloseTime;
 		
@@ -76,6 +78,11 @@ public abstract class ConfigManager{
 		return appName;
 	}
 	
+	
+	public final String getAppTimeZone( ){
+		return appTimeZone;
+	}
+	
 
 	public final String getRawAppOpenTime( ){
 		return appRawOpenTime;
@@ -102,43 +109,21 @@ public abstract class ConfigManager{
 	}
 	
 	
-	protected final Wini getWiniConfig( ){
-		return winiConfig;
+	protected final Config getConfig( ){
+		return configuration;
 	}
 	
 	
-	protected final Section parseSection( String section ){
-		return winiConfig.get( section );
-	}
-	
-	
-	protected final String parseSection( String section, String name ){
-		Ini.Section core 	= winiConfig.get( section );
-		String value		= core.get( name );
+	protected final Config loadConfigs( String fileName ){
 		
-		return value;
-	}
-	
-		
-	protected final Wini loadConfigs( String fileName ){
-		
-		Wini configuration	= null;
-		FileReader reader 	= null;
+		Config configuration= null;
 		
 		try{
 			
-			reader 			= new FileReader(fileName);
-			configuration 	= new Wini( reader );
-        
+			configuration 	= ConfigFactory.load( fileName );
+			
 		}catch( Exception e ){
 			throw new RuntimeException("Failed to load " + fileName, e );
-			
-		}finally{
-			if( reader != null ){
-				try{
-					reader.close();
-				}catch( Exception e ){}
-			}
 		}
 		
 		return configuration;
@@ -166,7 +151,7 @@ public abstract class ConfigManager{
 	
 	@Override
 	public String toString( ){
-		return winiConfig.toString( );
+		return configuration.toString( );
 	}
 
 }

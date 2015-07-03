@@ -9,6 +9,7 @@ import com.fluent.framework.transport.core.*;
 import com.fluent.framework.util.FluentThreadFactory;
 
 import static com.fluent.framework.util.FluentUtil.*;
+import static com.fluent.framework.util.FluentPreconditions.*;
 
 
 public final class FileMarketDataTransport extends AbstractTransport implements Runnable{
@@ -21,15 +22,22 @@ public final class FileMarketDataTransport extends AbstractTransport implements 
 	private final List<String> dataList;
 	private final ScheduledExecutorService executor;
 	
-	private final static String NAME		= FileMarketDataTransport.class.getSimpleName();
-	private final static Logger LOGGER      = LoggerFactory.getLogger( NAME );
+	private final static int DEFAULT_FREQUENCY		= ONE; 
+	private final static TimeUnit DEFAULT_TIMEUNIT	= TimeUnit.SECONDS;
+	private final static String NAME				= FileMarketDataTransport.class.getSimpleName();
+	private final static Logger LOGGER      		= LoggerFactory.getLogger( NAME );
 
+	
+	public FileMarketDataTransport( String fileLocation ){
+		this( fileLocation, DEFAULT_FREQUENCY, DEFAULT_TIMEUNIT );
+	}
+	
 	
 	public FileMarketDataTransport( String fileLocation, int frequency, TimeUnit timeUnit ){
 		super( TransportType.FILE );
 		
-		this.fileLocation 	= fileLocation;
-		this.frequency		= frequency;
+		this.fileLocation 	= notBlank(fileLocation, "File location must be valid.");
+		this.frequency		= notNegative(frequency, "Frequency must be positive.");
 		this.timeUnit		= timeUnit;
 		this.dataList		= loadData( );
 	    this.executor       = Executors.newSingleThreadScheduledExecutor( new FluentThreadFactory(NAME) );
@@ -44,20 +52,19 @@ public final class FileMarketDataTransport extends AbstractTransport implements 
 
 	
 	@Override
-	public final void init( ){
-		
-		if( dataList.isEmpty() ){
-			LOGGER.warn( "Shutting down publisher type [{}] as we didn't load any data.{}", getType(), NEWLINE );
-			stop();
-			return;
-		}
-		
-		executor.scheduleAtFixedRate( this, frequency, frequency, timeUnit );
-		LOGGER.info( "Publisher type [{}] started, will publish prices every {} {}.", getType(), frequency, timeUnit );
-	
+	public final boolean isConnected( ){
+		return true;
 	}
 	
 	
+	@Override
+	public final void init( ){
+		executor.scheduleAtFixedRate( this, frequency, 5*frequency, timeUnit);
+		LOGGER.info( "Publisher type [{}] started, will publish prices every {} {}.", getType(), frequency, timeUnit );
+	}
+	
+	
+
 	@Override
 	public final void run( ){
 		
@@ -65,7 +72,7 @@ public final class FileMarketDataTransport extends AbstractTransport implements 
 		
 		distribute( message );
 		++index;
-	
+		
 	}
 	
 	
@@ -88,7 +95,7 @@ public final class FileMarketDataTransport extends AbstractTransport implements 
 		    
 		}catch( Exception e ){
 			LOGGER.warn("FAILED to load data from [{}].", fileLocation, e );
-		
+						
 		}finally{
 			if( buff != null ){
 				try{
@@ -98,15 +105,10 @@ public final class FileMarketDataTransport extends AbstractTransport implements 
 		
 		}
 	
+		LOGGER.info( "Loaded [{}] counts of data from [{}].", dataList.size(), fileLocation );
+		
 		return dataList;
 		
-	}
-	
-
-	
-	@Override
-	public final boolean isConnected( ){
-		return true;
 	}
 
 	

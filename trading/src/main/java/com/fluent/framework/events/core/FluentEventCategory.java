@@ -38,5 +38,15 @@ public enum FluentEventCategory{
     }
 
     
+    public final static Set<FluentEventCategory> allInputs(){
+    	return INPUT;
+    }
+    
+    
+    public final static Set<FluentEventCategory> allOutputs(){
+    	return OUTPUT;
+    }
+    
+    
 
 }

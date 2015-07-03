@@ -1,5 +1,6 @@
 package com.fluent.framework.analysis;
 
+/*
 import org.slf4j.*;
 
 import java.util.*;
@@ -205,3 +206,5 @@ public final class ElasticSearchClient implements Runnable, InboundListener, Out
     }
 
 }
+
+*/

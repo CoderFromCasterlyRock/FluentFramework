@@ -41,6 +41,7 @@ public abstract class AbstractTransport implements Transport{
 	
 	
 	protected final void distribute( String message ){
+		
 		for( FluentDataListener listener : listeners ){
 			listener.onMessage( message );
 		}

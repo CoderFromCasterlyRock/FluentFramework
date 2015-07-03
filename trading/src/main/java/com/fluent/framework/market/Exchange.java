@@ -1,5 +1,7 @@
 package com.fluent.framework.market;
 
+import static com.fluent.framework.util.FluentUtil.*;
+
 
 public enum Exchange{
 
@@ -36,4 +38,10 @@ public enum Exchange{
     }
 
 
+    public final static Exchange valueFrom( String name ){
+        if( isBlank(name) ) return UNSUPPORTED;
+        return Exchange.valueOf( name.trim().toUpperCase() );
+    }
+    
+    
 }
