@@ -29,6 +29,9 @@ public enum FluentJsonTags{
     QUANTITIES          ("Quantities"),
     INSTRUMENTS         ("Instruments"),
     MARKETS             ("Markets"),
+    WORKING             ("Working"),
+    SLICES             	("Slice"),
+    INSTRUMENT_TYPE    	("InstrumentType"),
 
     //Market Data Header
     EXCHANGE            ("Exchange"),

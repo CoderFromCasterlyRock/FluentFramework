@@ -46,7 +46,7 @@ public final class InboundEventDispatcher implements FluentService, Runnable{
     @Override
     public final void prime(  ){
     	
-    	int warmupSize				= SIXTY_FOUR * DEFAULT_SIZE;
+    	int warmupSize		= SIXTY_FOUR * DEFAULT_SIZE;
     	InboundEvent event 	= new InboundWarmupEvent( );
     	
     	for( int i =ZERO; i < warmupSize; i++ ){
