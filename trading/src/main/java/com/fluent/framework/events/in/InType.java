@@ -8,7 +8,7 @@ import com.fluent.framework.events.core.FluentEventType;
 import static com.fluent.framework.events.core.FluentEventCategory.*;
 
 
-public enum InboundType implements FluentEventType{
+public enum InType implements FluentEventType{
 
    
 	NEW_STRATEGY				( FROM_TRADER_CATEGORY ),
@@ -21,7 +21,7 @@ public enum InboundType implements FluentEventType{
 	REFERENCE_DATA			    ( FROM_REFERENCE_CATEGORY ),
 	
 	METRONOME_EVENT				( FROM_INTERNAL_CATEGORY ),
-	WARM_UP_EVENT				( FROM_INTERNAL_CATEGORY ),
+	WARM_UP_EVENT				( FROM_INTERNAL_CATEGORY, 	false ),
 	START_UP_EVENT				( FROM_INTERNAL_CATEGORY ),
 	CLOSING_DOWN_EVENT			( FROM_INTERNAL_CATEGORY ),
 	LOOPBACK_EVENT				( FROM_INTERNAL_CATEGORY ),
@@ -33,16 +33,22 @@ public enum InboundType implements FluentEventType{
 
 
     private final FluentEventCategory category;
-   
-    private final static Set<InboundType> ALL_TYPES;
+    private final boolean isPersistable;
+    
+    private final static Set<InType> ALL_TYPES;
     
     static{
-    	ALL_TYPES = new HashSet<InboundType>(Arrays.asList(InboundType.values()));
+    	ALL_TYPES = new HashSet<InType>(Arrays.asList(InType.values()));
     }
     
 
-    InboundType( FluentEventCategory category ){
+    InType( FluentEventCategory category ){
+        this( category, true );
+    }
+    
+    InType( FluentEventCategory category, boolean isPersistable ){
         this.category       = category;
+        this.isPersistable	= isPersistable;
     }
 
 
@@ -56,8 +62,13 @@ public enum InboundType implements FluentEventType{
         return category;
     }
 
+
+    public final boolean isPersistable( ){
+        return isPersistable;
+    }
+
     
-    public final static Set<InboundType> allTypes( ){
+    public final static Set<InType> allTypes( ){
         return ALL_TYPES;
     }
     

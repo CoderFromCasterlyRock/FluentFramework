@@ -1,12 +1,15 @@
 package com.fluent.framework.transport.jeromq.transport;
 
 import org.slf4j.*;
+
 import zmq.ZError;
+
 import org.zeromq.*;
 import org.zeromq.ZMQ.*;
+
 import java.util.concurrent.*;
 
-import com.fluent.framework.util.FluentThreadFactory;
+import com.fluent.framework.collection.FluentThreadFactory;
 
 import static com.fluent.framework.util.FluentUtil.*;
 
@@ -39,7 +42,7 @@ public class ReliableRouterTransport extends AbstractTransport implements Runnab
 
 
     @Override
-    public final void init(){
+    public final void start(){
         try{
         	
         	router.setHWM( getHighWaterMark() );

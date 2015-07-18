@@ -3,7 +3,7 @@ package com.fluent.framework.core;
 import java.util.Arrays;
 
 import static com.fluent.framework.util.FluentUtil.*;
-
+import static com.fluent.framework.util.FluentToolkit.*;
 
 public final class FluentContext{
 	

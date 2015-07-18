@@ -5,7 +5,8 @@ import org.zeromq.*;
 import org.zeromq.ZMQ.*;
 
 import java.util.concurrent.*;
-import com.fluent.framework.util.FluentThreadFactory;
+
+import com.fluent.framework.collection.FluentThreadFactory;
 
 import static com.fluent.framework.util.FluentUtil.*;
 
@@ -45,7 +46,7 @@ public class ReliableSubscriberTransport extends AbstractTransport implements Ru
 
 
     @Override
-    public final void init(){
+    public final void start(){
         try{
         	
         	for( String topic : topics ){

@@ -1,12 +1,15 @@
 package com.fluent.framework.transport.jeromq.transport;
 
 import org.slf4j.*;
+
 import zmq.ZError;
+
 import org.zeromq.*;
 import org.zeromq.ZMQ.*;
+
 import java.util.concurrent.*;
 
-import com.fluent.framework.util.FluentThreadFactory;
+import com.fluent.framework.collection.FluentThreadFactory;
 
 
 public class ReliableDealerTransport extends AbstractTransport implements Runnable{
@@ -41,7 +44,7 @@ public class ReliableDealerTransport extends AbstractTransport implements Runnab
 
 
     @Override
-    public final void init(){
+    public final void start(){
         try{
 
             dealer.setHWM( getHighWaterMark() );

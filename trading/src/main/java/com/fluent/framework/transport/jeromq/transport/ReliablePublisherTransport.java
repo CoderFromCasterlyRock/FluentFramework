@@ -31,7 +31,7 @@ public class ReliablePublisherTransport extends AbstractTransport{
 
 
     @Override
-    public final void init(){
+    public final void start(){
       
     	try{
         	publisher.setHWM( getHighWaterMark() );

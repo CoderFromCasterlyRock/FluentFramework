@@ -12,7 +12,7 @@ import com.fluent.framework.core.*;
 import static com.fluent.framework.util.FluentUtil.*;
 
 
-public abstract class AbstractTransport implements FluentStartable{
+public abstract class AbstractTransport implements FluentService{
 
     private volatile boolean toLog;
     private final Set<ZListener<ZMsg>> listeners;

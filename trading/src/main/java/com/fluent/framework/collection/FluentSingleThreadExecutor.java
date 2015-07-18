@@ -1,36 +1,30 @@
 package com.fluent.framework.collection;
 
 import java.util.*;
-
 import org.slf4j.*;
-import org.jctools.queues.*;
 
 import java.util.concurrent.*;
-import java.util.concurrent.locks.*;
+import java.util.concurrent.atomic.*;
 
 import com.fluent.framework.core.*;
 
-import static com.fluent.framework.util.FluentUtil.*;
 
-
-public final class FluentThreadExecutor<T> implements FluentService, ExecutorService{
+public final class FluentSingleThreadExecutor implements FluentService, ExecutorService{
 
 	private volatile boolean running;
     private volatile boolean stopped;
     
-    private final int threadCount;
-    private final Thread[] threadArray;
-    private final Queue<Runnable> threadQueue;
+    private final Thread thread;
+    private final AtomicReference<Runnable> reference;
     
-    private final static String NAME    = FluentThreadExecutor.class.getSimpleName();
+    private final static String NAME    = FluentSingleThreadExecutor.class.getSimpleName();
     private final static Logger LOGGER  = LoggerFactory.getLogger( NAME );
     
     
-    public FluentThreadExecutor( int threadCount ){
+    public FluentSingleThreadExecutor( ThreadFactory factory ){
     	
-    	this.threadCount 	= threadCount;
-        this.threadArray 	= new Thread[threadCount];
-        this.threadQueue 	= new SpmcArrayQueue<Runnable>( SIXTY_FOUR * SIXTY_FOUR );
+    	this.reference 	= new AtomicReference<>();
+        this.thread		= factory.newThread( new Worker() );
     }
 
     
@@ -42,15 +36,8 @@ public final class FluentThreadExecutor<T> implements FluentService, ExecutorSer
     
     @Override
     public final void start( ){
-    	
     	running 	= true;
-        stopped 	= false;
-       
-    	for( int i = 0; i < threadCount; i++ ){
-    		threadArray[i] = new Thread( new Worker() );
-    		threadArray[i].start();
-        }
-    	
+        stopped		= false;
     }
     
     
@@ -60,26 +47,17 @@ public final class FluentThreadExecutor<T> implements FluentService, ExecutorSer
     	if( stopped ) return;
     	if( runnable == null ) return;
     	
-    	boolean inserted = threadQueue.offer(runnable);
-    	
-        while( !inserted ){
-        	LockSupport.parkNanos(1);
-        }
-    
+    	reference.set(runnable);
+    	thread.start();
+        
     }
 
    
    @Override
    public final void shutdown(){
-	   
 	   running = false;
-       for( int i = 0; i < threadCount; i++ ){
-    	   threadArray[i].interrupt();
-           threadArray[i] = null;
-       }
-       
+	   thread.interrupt();
        stopped = true;
-   
    }
    
    
@@ -102,28 +80,26 @@ public final class FluentThreadExecutor<T> implements FluentService, ExecutorSer
    
    
    @Override
-   @SuppressWarnings("hiding")
    public final <T> List<Future<T>> invokeAll( Collection<? extends Callable<T>> tasks ){
 	   throw new UnsupportedOperationException();
    }
    
    
    @Override
-   @SuppressWarnings("hiding")
    public final <T> List<Future<T>> invokeAll( Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit ){
 	   throw new UnsupportedOperationException();
    }
    
    
    @Override
-   @SuppressWarnings("hiding")
+   
    public final <T> T invokeAny( Collection<? extends Callable<T>> tasks ){
 	   throw new UnsupportedOperationException();
    }
    
    
    @Override
-   @SuppressWarnings("hiding")
+   
    public final <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit ){
 	   throw new UnsupportedOperationException();
    }
@@ -136,7 +112,7 @@ public final class FluentThreadExecutor<T> implements FluentService, ExecutorSer
    
    
    @Override
-   @SuppressWarnings("hiding")
+   
    public final <T> Future<T> submit( Callable<T> task ){
 	   throw new UnsupportedOperationException();
    }
@@ -149,7 +125,7 @@ public final class FluentThreadExecutor<T> implements FluentService, ExecutorSer
    
    
    @Override
-   @SuppressWarnings("hiding")
+   
    public final <T> Future<T> submit( Runnable task, T result ){
 	   throw new UnsupportedOperationException();
    }
@@ -184,9 +160,11 @@ public final class FluentThreadExecutor<T> implements FluentService, ExecutorSer
 				   
 				   if( Thread.interrupted() ) return;
 				   
-				   runnable = threadQueue.poll();
-				   if( runnable != null ) break;
-				   LockSupport.parkNanos(1);
+				   runnable = reference.get();
+				   if( runnable != null ) 
+					   break;
+				   
+				   FluentBackoffStrategy.apply();
 			   }
 				
 			   try{

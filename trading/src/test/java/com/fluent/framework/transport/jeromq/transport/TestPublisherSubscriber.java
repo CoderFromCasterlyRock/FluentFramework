@@ -3,7 +3,7 @@ package com.fluent.framework.transport.jeromq.transport;
 import org.zeromq.ZContext;
 import org.zeromq.ZMsg;
 
-import com.fluent.framework.core.FluentStartable;
+import com.fluent.framework.core.FluentService;
 import com.fluent.framework.transport.jeromq.transport.ReliablePublisherTransport;
 import com.fluent.framework.transport.jeromq.transport.ReliableSubscriberTransport;
 import com.fluent.framework.transport.jeromq.transport.ZListener;
@@ -12,7 +12,7 @@ import com.fluent.framework.transport.jeromq.transport.ZListener;
 public class TestPublisherSubscriber{
 	
 	
-	private class TestSubscriber implements ZListener<ZMsg>, FluentStartable{
+	private class TestSubscriber implements ZListener<ZMsg>, FluentService{
 	
 		private final ReliableSubscriberTransport subscriber;
 		
@@ -20,9 +20,9 @@ public class TestPublisherSubscriber{
 			this.subscriber		= new ReliableSubscriberTransport(false, 100000, 10, "tcp://localhost:7090", context);
 		}
 		
-		public void init(){
+		public void start(){
 			subscriber.subscribe(this);
-			subscriber.init();
+			subscriber.start();
 		}
 		
 		@Override
@@ -43,7 +43,7 @@ public class TestPublisherSubscriber{
 	}
 	
 	
-	private class TestPublisher implements FluentStartable{
+	private class TestPublisher implements FluentService{
 		
 		private final ReliablePublisherTransport publisher;
 		
@@ -51,8 +51,8 @@ public class TestPublisherSubscriber{
 			this.publisher		= new ReliablePublisherTransport(true, 100000, 10, "tcp://*:7090", context);
 		}
 		
-		public void init(){
-			publisher.init();
+		public void start(){
+			publisher.start();
 		}
 		
 		@Override
@@ -79,10 +79,10 @@ public class TestPublisherSubscriber{
 		TestSubscriber subscriber	= te.new TestSubscriber(context);
 		TestPublisher publisher		= te.new TestPublisher(context);
 		
-		subscriber.init();
+		subscriber.start();
 		Thread.sleep(1000);
 		
-		publisher.init();
+		publisher.start();
 		Thread.sleep(3000);
 		
 		for( int i =0; i<1000; i++ ){

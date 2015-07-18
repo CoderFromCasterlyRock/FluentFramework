@@ -1,33 +1,34 @@
 package com.fluent.framework.persistence;
 
 import java.io.File;
+
 import org.HdrHistogram.*;
-import com.fluent.framework.events.in.*;
+
+import com.fluent.framework.util.FluentUtil;
 
 import static java.util.concurrent.TimeUnit.*;
 
 
-public class FluentPersisterPerformance{
+public class FASTEventPersisterLatency{
 
 	
 	public static void main( String[] args ){
 
-		Persister persister = null;
+		EventFstPersister persister = null;
 		
 		try{
 			
-			int eventCount 			= 50000;
+			int eventCount 			= 1 * 1000 * 1000;
 			int size1ObjBytes		= 1000;
 			long totalSizeBytes 	= eventCount * size1ObjBytes;
 			String fileLocation		= "C:\\Temp";
 			Histogram histogram		= new Histogram( NANOSECONDS.convert(1, SECONDS), 2);
 			persister				= new EventFstPersister(fileLocation, "", "Test", totalSizeBytes, eventCount );
-			persister.init();
+			persister.start();
 						
 			for( int i=0; i< eventCount; i++ ){
 				long startTimeNanos		= System.nanoTime();
-				InboundWarmupEvent event = new InboundWarmupEvent();
-				persister.persist( event );
+				persister.persist( FluentUtil.IN_WARMUP_EVENT );
 				long timeTakenNanos		= System.nanoTime() - startTimeNanos;
 				histogram.recordValue( timeTakenNanos );
 			}
@@ -39,7 +40,7 @@ public class FluentPersisterPerformance{
 			}
 		
 			System.out.println("Result of storing " + eventCount + " MarketDataEvents.");
-			System.out.println("Time taken (in micros) of 99.99th percentile " +  histogram.getValueAtPercentile(99.99d) );
+			System.out.println("Time taken (in micros) of 99.99th percentile " +  (histogram.getValueAtPercentile(99d)/1000.0) );
 			System.out.println("---------------------------------------------------" );
 			histogram.outputPercentileDistribution( System.out,  1000.0 );
 			

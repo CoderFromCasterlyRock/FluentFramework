@@ -3,7 +3,7 @@ package com.fluent.framework.transport.jeromq.transport;
 import org.zeromq.ZContext;
 import org.zeromq.ZMsg;
 
-import com.fluent.framework.core.FluentStartable;
+import com.fluent.framework.core.FluentService;
 import com.fluent.framework.transport.jeromq.transport.ReliableDealerTransport;
 import com.fluent.framework.transport.jeromq.transport.ReliableRouterTransport;
 import com.fluent.framework.transport.jeromq.transport.ZListener;
@@ -12,7 +12,7 @@ import com.fluent.framework.transport.jeromq.transport.ZListener;
 public class TestDealerRouter{
 	
 	
-	private class TestRouter implements ZListener<ZMsg>, FluentStartable{
+	private class TestRouter implements ZListener<ZMsg>, FluentService{
 	
 		private final ReliableRouterTransport router;
 		
@@ -20,9 +20,9 @@ public class TestDealerRouter{
 			this.router		= new ReliableRouterTransport(false, 100000, 10, "tcp://localhost:9070", context);
 		}
 		
-		public void init(){
+		public void start(){
 			router.subscribe(this);
-			router.init();
+			router.start();
 		}
 		
 		@Override
@@ -43,7 +43,7 @@ public class TestDealerRouter{
 	}
 	
 	
-	private class TestDealer implements ZListener<String>, FluentStartable{
+	private class TestDealer implements ZListener<String>, FluentService{
 		
 		private final ReliableDealerTransport dealer;
 		
@@ -51,8 +51,8 @@ public class TestDealerRouter{
 			this.dealer		= new ReliableDealerTransport(true, 100000, 10, "TestDealer", "tcp://localhost:9070", context);
 		}
 		
-		public void init(){
-			dealer.init();
+		public void start(){
+			dealer.start();
 		}
 		
 		@Override
@@ -84,10 +84,10 @@ public class TestDealerRouter{
 		TestRouter router	= te.new TestRouter(context);
 		TestDealer dealer	= te.new TestDealer(context);
 		
-		router.init();
+		router.start();
 		Thread.sleep(1000);
 		
-		dealer.init();
+		dealer.start();
 	
 		for( int i =0; i<100; i++ ){
 			dealer.send( String.valueOf(System.currentTimeMillis()));

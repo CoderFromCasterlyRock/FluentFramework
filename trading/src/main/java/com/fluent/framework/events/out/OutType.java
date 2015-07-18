@@ -8,25 +8,30 @@ import com.fluent.framework.events.core.FluentEventType;
 import static com.fluent.framework.events.core.FluentEventCategory.*;
 
 
-public enum OutboundType implements FluentEventType{
+public enum OutType implements FluentEventType{
 
-	WARM_UP_EVENT		( FROM_INTERNAL_CATEGORY ),
+	WARM_UP_EVENT		( FROM_INTERNAL_CATEGORY, false ),
     ORDER_TO_MARKET     ( TO_MARKET_CATEGORY	),
     EVENT_TO_LOGGER     ( TO_ANALYSIS_CATEGORY 	),
     EVENT_TO_TRADER     ( TO_TRADER_CATEGORY	);
 
     private final FluentEventCategory category;
-
-    private final static Set<OutboundType> ALL_TYPES;
+    private final boolean isPersistable;
+    
+    private final static Set<OutType> ALL_TYPES;
    
 
     static{
-    	ALL_TYPES = new HashSet<OutboundType>(Arrays.asList(OutboundType.values()));
+    	ALL_TYPES = new HashSet<OutType>(Arrays.asList(OutType.values()));
     }
 
-
-    OutboundType( FluentEventCategory category ){
+    OutType( FluentEventCategory category ){
+        this( category, true );
+    }
+    
+    OutType( FluentEventCategory category, boolean isPersistable ){
         this.category       = category;
+        this.isPersistable	= isPersistable;
     }
 
 
@@ -35,14 +40,19 @@ public enum OutboundType implements FluentEventType{
         return name();
     }
 
+    
+    public final boolean isPersistable( ){
+        return isPersistable;
+    }
 
+    
     @Override
     public final FluentEventCategory getCategory( ){
         return category;
     }
 
     
-    public final static Set<OutboundType> allTypes( ){
+    public final static Set<OutType> allTypes( ){
         return ALL_TYPES;
     }
 

@@ -1,20 +1,21 @@
 package com.fluent.framework.persistence;
 
 import java.util.*;
-import org.slf4j.*;
 
+import org.slf4j.*;
 import org.nustaq.offheap.FSTLongOffheapMap;
 import org.nustaq.serialization.simpleapi.DefaultCoder;
 import org.nustaq.serialization.simpleapi.FSTCoder;
 
+import com.fluent.framework.core.FluentService;
 import com.fluent.framework.events.core.*;
-import com.fluent.framework.events.in.InboundEvent;
-import com.fluent.framework.events.out.OutboundEvent;
+import com.fluent.framework.events.in.InEvent;
+import com.fluent.framework.events.out.OutEvent;
 
 import static com.fluent.framework.util.FluentUtil.*;
 
 
-public final class EventFstPersister implements Persister{
+public final class EventFstPersister implements FluentService{
 
 	private final String fileName;
 	private final int eventCount;
@@ -22,7 +23,7 @@ public final class EventFstPersister implements Persister{
 	private final FSTLongOffheapMap<FluentEvent> offHeapMap;
 	
 	private final static String JOURNAL_SUFFIX	= ".mmf";
-    private final static String NAME			= InboundEventPersisterService.class.getSimpleName();
+    private final static String NAME			= InChroniclePersisterService.class.getSimpleName();
     private final static Logger LOGGER      	= LoggerFactory.getLogger( NAME );
 
 
@@ -41,7 +42,6 @@ public final class EventFstPersister implements Persister{
     }
 
 	
-	@Override
 	public final String getFileName(){
 		return fileName;
 	}
@@ -59,8 +59,8 @@ public final class EventFstPersister implements Persister{
 	
 
     @Override
-    public final void init( ){
-    	fstCoder.getConf().registerClass( FluentEvent.class, InboundEvent.class, OutboundEvent.class);
+    public final void start( ){
+    	fstCoder.getConf().registerClass( FluentEvent.class, InEvent.class, OutEvent.class );
     	LOGGER.info("[{}] initialized, will Persist and recover all Input events.", NAME );
     }
 
@@ -82,43 +82,27 @@ public final class EventFstPersister implements Persister{
 
     
     
-    @Override
-    public final void persistAll( FluentEvent ... events ){
-    	for( FluentEvent event : events ){
-    	    persist( event );
-    	}
-    }
-    
-
-    @Override
     public final void persist( final FluentEvent event ){
-    	offHeapMap.put( event.getSequenceId(), event );      
+    	offHeapMap.put( event.getSequenceId(), event );  
     }
 
 
-    @Override
-    public final Collection<FluentEvent> retrieveAllEvents( ){
-    	return retrieveAll().values();
-    }
-    
-    
-    @Override
-    public final Map<Long, FluentEvent> retrieveAll( ){
+    public final List<FluentEvent> retrieveAll( ){
 
-    	Map<Long, FluentEvent> retrievedMap = new HashMap<>( eventCount );
+    	List<FluentEvent> list = new ArrayList<>( eventCount );
         
         try{
 
         	for( Iterator<FluentEvent> iterator = offHeapMap.values(); iterator.hasNext(); ){
         		FluentEvent event = (FluentEvent) iterator.next( );
-        		retrievedMap.put( event.getSequenceId(), event );
+        		list.add( event );
         	}
         	
         }catch( Exception e ){
-               LOGGER.warn( "Failed to retrieve events from [{}].", fileName, e );
+        	LOGGER.warn( "Failed to retrieve events from [{}].", fileName, e );
         }
 
-        return retrievedMap;
+        return list;
 
     }
     

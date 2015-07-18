@@ -1,12 +1,14 @@
 package com.fluent.framework.transport.file;
 
 import java.io.*;
+
 import org.slf4j.*;
+
 import java.util.*;
 import java.util.concurrent.*;
 
+import com.fluent.framework.collection.FluentThreadFactory;
 import com.fluent.framework.transport.core.*;
-import com.fluent.framework.util.FluentThreadFactory;
 
 import static com.fluent.framework.util.FluentUtil.*;
 import static com.fluent.framework.util.FluentPreconditions.*;
@@ -58,7 +60,7 @@ public final class FileMarketDataTransport extends AbstractTransport implements 
 	
 	
 	@Override
-	public final void init( ){
+	public final void start( ){
 		executor.scheduleAtFixedRate( this, frequency, 5*frequency, timeUnit);
 		LOGGER.info( "Publisher type [{}] started, will publish prices every {} {}.", getType(), frequency, timeUnit );
 	}

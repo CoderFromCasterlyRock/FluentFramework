@@ -1,4 +1,4 @@
-package com.fluent.framework.util;
+package com.fluent.framework.collection;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;

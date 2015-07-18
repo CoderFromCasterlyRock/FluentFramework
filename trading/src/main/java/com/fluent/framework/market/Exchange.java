@@ -1,6 +1,7 @@
 package com.fluent.framework.market;
 
-import static com.fluent.framework.util.FluentUtil.*;
+import static com.fluent.framework.util.FluentToolkit.*;
+
 
 
 public enum Exchange{

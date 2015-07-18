@@ -1,30 +1,34 @@
 package com.fluent.framework.admin;
 
 import org.slf4j.*;
+
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
+import com.fluent.framework.collection.FluentThreadFactory;
 import com.fluent.framework.config.*;
 import com.fluent.framework.core.*;
 import com.fluent.framework.util.*;
 import com.fluent.framework.core.FluentContext.Environment;
 import com.fluent.framework.core.FluentContext.FluentState;
-import com.fluent.framework.events.in.InboundEvent;
-import com.fluent.framework.events.in.InboundEventDispatcher;
+import com.fluent.framework.events.in.InEvent;
+import com.fluent.framework.events.in.InEventDispatcher;
 
 import static java.util.concurrent.TimeUnit.*;
 import static com.fluent.framework.util.FluentUtil.*;
+import static com.fluent.framework.util.FluentToolkit.*;
 import static com.fluent.framework.core.FluentContext.*;
 import static com.fluent.framework.core.FluentContext.FluentState.*;
 
 
-public final class StateManager implements Runnable, FluentStartable{
+public final class StateManager implements Runnable, FluentService{
 
 	private volatile boolean keepRunning;
 	
 	private final int delay;
 	private final TimeUnit unit;
 	private final ConfigManager config;
+	private final InEventDispatcher inDispatcher;
 	private final ScheduledExecutorService service;
 		
 	private final static AtomicReference<FluentState> APP_STATE;
@@ -40,17 +44,18 @@ public final class StateManager implements Runnable, FluentStartable{
     }
 
     
-    public StateManager( ConfigManager config ){
-    	this( DEFAULT_DELAY, DEFAULT_UNIT, config );
+    public StateManager( ConfigManager config, InEventDispatcher inDispatcher ){
+    	this( DEFAULT_DELAY, DEFAULT_UNIT, config, inDispatcher );
     }
     
     
-    public StateManager( int delay, TimeUnit unit, ConfigManager config ){
+    public StateManager( int delay, TimeUnit unit, ConfigManager config, InEventDispatcher inDispatcher ){
     	
-    	this.delay	 	= delay;
-    	this.unit		= unit;
-    	this.config		= config;
-    	this.service	= Executors.newSingleThreadScheduledExecutor( new FluentThreadFactory(NAME) );
+    	this.delay	 		= delay;
+    	this.unit			= unit;
+    	this.config			= config;
+    	this.inDispatcher	= inDispatcher;
+    	this.service		= Executors.newSingleThreadScheduledExecutor( new FluentThreadFactory(NAME) );
         
     }
 
@@ -63,7 +68,7 @@ public final class StateManager implements Runnable, FluentStartable{
 
 	
 	@Override
-	public final void init( ){
+	public final void start( ){
 		keepRunning = true;
 		service.scheduleAtFixedRate( this, delay, delay, unit );
 		LOGGER.info("Successfully started Application state manager, generating Metronome events every {} {}.", delay, unit );
@@ -83,9 +88,9 @@ public final class StateManager implements Runnable, FluentStartable{
 	
 	protected final void sendMetronomeEvent( ){
 		long secondsToClose		 = getSecondsToClose( );
-		InboundEvent metro = new MetronomeEvent( secondsToClose );
+		InEvent metro = new MetronomeEvent( secondsToClose );
 		
-		InboundEventDispatcher.enqueue( metro );
+		inDispatcher.enqueue( metro );
 	}
 	
 	

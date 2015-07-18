@@ -3,20 +3,20 @@ package com.fluent.framework.events.in;
 import com.fluent.framework.events.core.FluentEvent;
 
 
-public abstract class InboundEvent extends FluentEvent{
+public abstract class InEvent extends FluentEvent{
 
-    private final InboundType type;
+    private final InType type;
 
     private final static long serialVersionUID = 1l;
     
     
-    public InboundEvent( InboundType type ){
+    public InEvent( InType type ){
         this.type   = type;    	
     }   
 
    
     @Override
-    public final InboundType getType( ){
+    public final InType getType( ){
         return type;
     }
 
