@@ -9,8 +9,37 @@ import static com.fluent.framework.util.FluentUtil.*;
 
 public final class FluentToolkit{
 
-    protected FluentToolkit(){}
     
+	protected FluentToolkit(){}
+	
+	
+	public static <T> T notNull( T reference, Object message ){
+		if( reference == null ){
+			throw new NullPointerException( String.valueOf(message) );
+		 }
+		 
+		return reference;
+	}
+	
+
+	public static String notBlank( String reference, Object message ){
+		if( reference == null || reference.trim().isEmpty() ){
+			throw new IllegalStateException( String.valueOf(message) );
+		 }
+		 
+		return reference;
+	}
+	
+	
+	public static int notNegative( int value, Object message ){
+		if( value <= 0 ){
+			throw new IllegalStateException( String.valueOf(message) );
+		 }
+		 
+		return value;
+	}
+	
+	    
    
     protected final static boolean isWindows(  ){
     	String osType = System.getProperty("os.name").toLowerCase();
@@ -21,6 +50,18 @@ public final class FluentToolkit{
     protected final static boolean isLinux(  ){
     	String osType = System.getProperty("os.name").toLowerCase();
     	return osType.indexOf("nix") >= ZERO || osType.indexOf("nux") >= ZERO || osType.indexOf("aix") > ZERO;
+    }
+    
+    
+    public final static boolean isInteger( String data ){
+    	
+    	try{
+    		Integer.parseInt(data);
+    		return true;
+    	}catch(Exception e ){}
+    	
+    	return false;
+        
     }
     
 
@@ -95,5 +136,7 @@ public final class FluentToolkit{
     
     }
     
+    
+
 }
 

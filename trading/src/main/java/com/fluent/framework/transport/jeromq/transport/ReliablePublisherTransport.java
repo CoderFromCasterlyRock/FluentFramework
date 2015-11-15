@@ -5,14 +5,14 @@ import org.zeromq.*;
 import org.zeromq.ZMQ.*;
 
 //TODO: Publisher should only start publishing when it explicitly gets a READY message via a dealer socket.
-public class ReliablePublisherTransport extends AbstractTransport{
+public class ReliablePublisherTransport extends AbstractJMQTransport{
 
     private volatile boolean isAlive;
 
     private final Socket publisher;
     private final String address;
     
-    private final static String NAME        = AbstractTransport.class.getSimpleName();
+    private final static String NAME        = AbstractJMQTransport.class.getSimpleName();
     private final static Logger LOGGER      = LoggerFactory.getLogger( NAME );
 
     

@@ -1,27 +1,31 @@
 package com.fluent.framework.persistence;
 
-import net.openhft.chronicle.Chronicle;
-import net.openhft.chronicle.ChronicleQueueBuilder.*;
-import net.openhft.chronicle.ExcerptAppender;
-import net.openhft.chronicle.ExcerptTailer;
-
 import org.slf4j.*;
+
+import java.io.*;
+import java.util.*;
+
 import org.jctools.queues.*;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import net.openhft.chronicle.Chronicle;
+import net.openhft.chronicle.ChronicleQueueBuilder.*;
+import net.openhft.chronicle.tools.ChronicleTools;
+import net.openhft.chronicle.ExcerptAppender;
+import net.openhft.chronicle.ExcerptTailer;
 
 import com.fluent.framework.collection.*;
 import com.fluent.framework.config.ConfigManager;
 import com.fluent.framework.events.in.InEvent;
-import com.fluent.framework.util.FluentUtil;
+
+
+import com.fluent.framework.events.in.InListener;
+import com.fluent.framework.events.in.InType;
 
 import static com.fluent.framework.util.FluentUtil.*;
 import static com.fluent.framework.util.FluentToolkit.*;
 
 
-public final class InChroniclePersisterService implements Runnable, PersisterService<InEvent>{
+public final class InChroniclePersisterService implements Runnable, InListener, PersisterService<InEvent>{
 
 	private volatile boolean keepDispatching;
 	
@@ -33,23 +37,23 @@ public final class InChroniclePersisterService implements Runnable, PersisterSer
 	private final SpscArrayQueue<InEvent> eventQueue;
 	private final FluentSingleThreadExecutor service;
 	
-	private final static int DEFAULT_SIZE	= nextPowerOfTwo(MILLION);
+	private final static int DEFAULT_SIZE	= MILLION;
 	private final static String NAME		= InChroniclePersisterService.class.getSimpleName();
     private final static Logger LOGGER     	= LoggerFactory.getLogger( NAME );
 
     //AlgoConfigManager cfgManager
     public InChroniclePersisterService( ConfigManager cfgManager) throws IOException{
-    	this( DEFAULT_SIZE, DEFAULT_SIZE, "" );
+    	this( DEFAULT_SIZE, "" );
     }
     
     public InChroniclePersisterService( int eventCount, String basePath ) throws IOException{
-    	this( eventCount, DEFAULT_SIZE, basePath );
+    	this( eventCount, eventCount, basePath );
     }
 
     public InChroniclePersisterService( int eventCount, int queueSize, String basePath ) throws IOException{
     	
     	this.eventCount 	= eventCount;
-    	this.queueSize 		= queueSize;
+    	this.queueSize 		= nextPowerOfTwo(queueSize);
     	this.basePath		= basePath;
     	this.chronicle		= createChronicle( eventCount, basePath );
     	this.excerpt		= chronicle.createAppender();
@@ -63,6 +67,12 @@ public final class InChroniclePersisterService implements Runnable, PersisterSer
     public final String name( ){
         return NAME;
     }
+	
+	
+	@Override
+	public final boolean isSupported( InType type ){
+		return ( InType.WARM_UP_EVENT != type );
+	}
 
 	
 	public final int getEventCount( ){
@@ -77,10 +87,11 @@ public final class InChroniclePersisterService implements Runnable, PersisterSer
 	private final void prime( ){
 	    	
 		for( int i =ZERO; i <( eventCount); i++ ){
-    		eventQueue.offer( FluentUtil.IN_WARMUP_EVENT );
+    		eventQueue.offer( IN_WARMUP_EVENT );
     		eventQueue.poll( );
     	}
 
+		ChronicleTools.warmup();
     	eventQueue.clear();
     	
     }
@@ -102,20 +113,21 @@ public final class InChroniclePersisterService implements Runnable, PersisterSer
 
     
     @Override
-    public final boolean persistEvent( InEvent event ){
-    	if( event.getType().isPersistable() ){
-    		return eventQueue.offer( event );
-    	}
-    	
-    	return false;
-    }
+	public final boolean inUpdate( InEvent event ){
+    	return eventQueue.offer( event );
+	}
+
     
     
     protected static Chronicle createChronicle( int eventCount, String basePath ){
     	
     	Chronicle chronicle = null;
     	try{
-    		chronicle = IndexedChronicleQueueBuilder.indexed(basePath).build();
+    		chronicle = IndexedChronicleQueueBuilder
+    				.indexed(basePath)
+    				//.dataBlockSize(128)
+    				//.indexBlockSize(128)
+    				.build();
     		
     	}catch( Exception e ){
     		throw new IllegalStateException("Failed to create Chronicle at " + basePath, e );
@@ -155,10 +167,12 @@ public final class InChroniclePersisterService implements Runnable, PersisterSer
             
     }
 
+    //TODO: Replace it with the upper bound of object size we expect to save in bytes
     protected final boolean persist( InEvent event ){
     	boolean successful = false;
     	
     	try{
+    		
     		excerpt.startExcerpt( 500 );
     		excerpt.writeObject( event );
     		excerpt.finish();
@@ -177,7 +191,7 @@ public final class InChroniclePersisterService implements Runnable, PersisterSer
     public final List<InEvent> retrieveAll(  ){
     	
     	ExcerptTailer reader	= null;
-    	List<InEvent> list	= new ArrayList<>( eventCount );
+    	List<InEvent> list		= new ArrayList<>( eventCount );
     	
     	try{
     		
@@ -221,5 +235,6 @@ public final class InChroniclePersisterService implements Runnable, PersisterSer
     	}
         
     }
+
 
 }

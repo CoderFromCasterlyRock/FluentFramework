@@ -6,6 +6,6 @@ public interface InListener{
 
 	public String name();
     public boolean isSupported( InType type );
-    public boolean update( InEvent event );
+    public boolean inUpdate( InEvent event );
 
 }

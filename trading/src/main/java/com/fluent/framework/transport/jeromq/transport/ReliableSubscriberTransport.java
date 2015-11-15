@@ -13,7 +13,7 @@ import static com.fluent.framework.util.FluentUtil.*;
 
 //TODO: Subscriber should explicitly send publisher a READY message via a dealer socket.
 
-public class ReliableSubscriberTransport extends AbstractTransport implements Runnable{
+public class ReliableSubscriberTransport extends AbstractJMQTransport implements Runnable{
 
     private volatile boolean isAlive;
 
@@ -22,7 +22,7 @@ public class ReliableSubscriberTransport extends AbstractTransport implements Ru
     private final String[] topics;
     private final ExecutorService service;
 
-    private final static String NAME        = AbstractTransport.class.getSimpleName();
+    private final static String NAME        = AbstractJMQTransport.class.getSimpleName();
     private final static Logger LOGGER      = LoggerFactory.getLogger( NAME );
 
     public ReliableSubscriberTransport( boolean toLog, int hwm, int linger, String address, ZContext context ){

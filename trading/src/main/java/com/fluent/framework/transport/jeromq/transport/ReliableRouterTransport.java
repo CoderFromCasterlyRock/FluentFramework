@@ -14,7 +14,7 @@ import com.fluent.framework.collection.FluentThreadFactory;
 import static com.fluent.framework.util.FluentUtil.*;
 
 
-public class ReliableRouterTransport extends AbstractTransport implements Runnable{
+public class ReliableRouterTransport extends AbstractJMQTransport implements Runnable{
 
     private volatile boolean isAlive;
 
@@ -22,7 +22,7 @@ public class ReliableRouterTransport extends AbstractTransport implements Runnab
     private final String address;
     private final ExecutorService service;
 
-    private final static String NAME        = AbstractTransport.class.getSimpleName();
+    private final static String NAME        = AbstractJMQTransport.class.getSimpleName();
     private final static Logger LOGGER      = LoggerFactory.getLogger( NAME );
 
     public ReliableRouterTransport( boolean toLog, int hwm, int linger, String address, ZContext context ){

@@ -2,7 +2,6 @@ package com.fluent.framework.util;
 
 import java.io.*;
 
-import com.eclipsesource.json.JsonObject;
 import com.fluent.framework.events.in.InEvent;
 import com.fluent.framework.events.in.InType;
 import com.fluent.framework.events.out.OutEvent;
@@ -19,6 +18,8 @@ public final class FluentUtil{
     public static final int THREE               	= 3;
     public static final int FOUR                	= 4;
     public static final int FIVE                	= 5;
+    public static final int SIX  	              	= 6;
+    public static final int SEVEN                	= 7;
     public static final int EIGHT               	= 8;
     public static final int TEN                 	= 10;
     public static final int SIXTEEN             	= 16;
@@ -30,6 +31,7 @@ public final class FluentUtil{
     public static final int THOUSAND            	= 1000;
     public static final int MILLION	            	= 1000 * 1000;
     public static final int NEGATIVE_ONE        	= -1;
+    public static final long _24_HOURS_IN_MILLIS   	= 24*60*60*60;
 
     public static final char COLON_CHAR         	= ':';
     public static final byte[] EMPTY_BYTE       	= {};
@@ -46,6 +48,7 @@ public final class FluentUtil{
     public static final String EMPTY            	= "";
     public static final String SPACE            	= " ";
     public static final String COMMA            	= ",";
+    public static final String COMMASP            	= ", ";
     public static final String COLON            	= ":";
     public static final String QUOTE            	= "\"";
     public static final String NEWLINE          	= "\n";
@@ -71,57 +74,33 @@ public final class FluentUtil{
     
     private static final class InWarmupEvent extends InEvent{
     	
-    	private final String eventId;
-    		
     	private final static long serialVersionUID = 1L;
-    	private final static String PREFIX			= "Warmup_"; 
-    	
     	
     	public InWarmupEvent( ){
     		super( InType.WARM_UP_EVENT );
-    		
-    		this.eventId	= PREFIX + getSequenceId(); 
     	}
     	
-    	
-    	@Override
-    	public final String getEventId( ){
-    		return eventId;
-    	}
 
-    	
-    	@Override
-    	protected final void toJSON( JsonObject object ){}
-
+		@Override
+		public final void toEventString(StringBuilder builder ){}
+		
     }
     
     
     private static final class OutWarmupEvent extends OutEvent{
     	
-    	private final String eventId;
-    		
     	private final static long serialVersionUID = 1L;
-    	private final static String PREFIX			= "WarmupOut_"; 
     	
 
     	public OutWarmupEvent( ){
     		super( OutType.WARM_UP_EVENT );
-    		
-    		this.eventId	  	= PREFIX + getSequenceId(); 
-    	}
-    	
-    	
-    	@Override
-    	public final String getEventId( ){
-    		return eventId;
     	}
 
-    	
-    	@Override
-    	protected final void toJSON( JsonObject object ) {}
-    	
-    	
+
+		@Override
+		public final void toEventString( StringBuilder builder ){}
 
     }
+
 }
 

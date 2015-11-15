@@ -4,9 +4,11 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import com.fluent.framework.events.core.FluentDataListener;
+import com.fluent.framework.transport.core.Transport;
+import com.fluent.framework.transport.core.TransportType;
 
 
-public abstract class AbstractTransport implements Transport{
+public abstract class AbstractTransport implements Transport<FluentDataListener>{
 
 	private final TransportType type;
 	private final AbstractSet<FluentDataListener> listeners;
@@ -25,18 +27,14 @@ public abstract class AbstractTransport implements Transport{
 
 	
 	@Override
-	public final boolean register( FluentDataListener listener ){
-		if( listener == null ) return false;
-		
-		return listeners.add( listener );
+	public final void register( FluentDataListener listener ){
+		listeners.add( listener );
 	}
 
 		
 	@Override
-	public final boolean deregister( FluentDataListener listener ){
-		if( listener == null ) return false;
-		
-		return listeners.remove( listener );
+	public final void deregister( FluentDataListener listener ){
+		listeners.remove( listener );
 	}
 	
 	

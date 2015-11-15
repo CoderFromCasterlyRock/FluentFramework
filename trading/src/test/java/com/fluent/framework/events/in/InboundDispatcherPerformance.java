@@ -1,13 +1,17 @@
 package com.fluent.framework.events.in;
 
 import java.io.*;
+
 import org.slf4j.*;
+
 import java.util.*;
 import java.util.concurrent.*;
+
 import org.HdrHistogram.*;
 
-import com.fluent.framework.market.Exchange;
-import com.fluent.framework.market.MarketDataEvent;
+import com.fluent.framework.market.core.Exchange;
+import com.fluent.framework.market.core.InstrumentSubType;
+import com.fluent.framework.market.event.MarketDataEvent;
 import com.fluent.framework.persistence.InChroniclePersisterService;
 import com.fluent.framework.persistence.PersisterService;
 import com.fluent.framework.events.in.InEvent;
@@ -17,13 +21,14 @@ import com.fluent.framework.events.in.InEventDispatcher;
 
 import static com.fluent.framework.util.FluentUtil.*;
 
-
+//IMPROVEMENTS
+// If you lower the OS parameter vm.dirty_expire_centisecs it reduces the peaks and make them more stable, but do not eliminate them all together
 public final class InboundDispatcherPerformance{
 
-	private final static int TEST_ITERATION 		= 5;
 	private final static int TEST_BUCKET_CAPACITY 	= 64;
 	private final static int EXPECTED_AVG_LATENCY	= 50 *1000;
-	private final static int[] TEST_EVENT_COUNT		= {50000, 75000, 1000000, 2000000, 45000 };
+	//private final static int[] TEST_EVENT_COUNT		= {50000, 75000, 1000000, 2000000, 45000 };
+	private final static int[] TEST_EVENT_COUNT		= {50000, 2000000, 45000 };
 	private final static String CHRONCILE_LOCATION	= "target/";
 	
     private final static String NAME				= InboundDispatcherPerformance.class.getSimpleName();
@@ -36,7 +41,7 @@ public final class InboundDispatcherPerformance{
 		dispatcher.register( listener );
 		
         for( int i = 0; i< eventCount; i++ ){
-        	InEvent event = new MarketDataEvent( Exchange.CME, "EDM6", 99.0, 100+i, 100.0, 200+i );
+        	InEvent event = new MarketDataEvent( Exchange.CME, InstrumentSubType.ED_FUTURES, "EDM6", 99.0, 100+i, 100.0, 200+i );
         	dispatcher.enqueue( event );
         	
         	/*
@@ -46,9 +51,13 @@ public final class InboundDispatcherPerformance{
         	*/
         }
         
+    	while( eventCount != listener.getEventsReceived() ){
+    		Thread.yield();
+    	}
+        
         double latency99Percentile	= listener.get99PercentileLatency(false, LOGGER);
         
-        Thread.sleep( 5000 );
+        //Thread.sleep( 7000 );
         dispatcher.deregister(listener);
         
         return latency99Percentile;
@@ -57,13 +66,15 @@ public final class InboundDispatcherPerformance{
 	
 	public static void main( String ... args ) throws Exception{
 	    
+		int testIterations	= TEST_EVENT_COUNT.length;
+		
 		LOGGER.info("STARTING INBOUND DISPATCHER LATENCY TEST!!");
-		LOGGER.info("Tests will run [{}] iterations, will feed events {}.", TEST_ITERATION, Arrays.toString(TEST_EVENT_COUNT) );
+		LOGGER.info("Tests will run [{}] iterations, will feed events {}.", testIterations, Arrays.toString(TEST_EVENT_COUNT) );
 		LOGGER.info("-----------------------------------------------------------------------------------------------------------{}", NEWLINE );
 		
-		double[] avgObservedLatencyArray	= new double[TEST_ITERATION];
+		double[] avgObservedLatencyArray	= new double[testIterations];
 				
-        for( int run = 0; run< TEST_ITERATION; run++ ){
+        for( int run = 0; run< testIterations; run++ ){
         	
         	try{
         	
@@ -71,8 +82,8 @@ public final class InboundDispatcherPerformance{
         		String chronicleFileName 	= CHRONCILE_LOCATION + "InDispacterTest_" + run;
         
         		//ChronicleTools.warmup();
-        		PersisterService<InEvent> p	= new InChroniclePersisterService(eventThisIteration, chronicleFileName);
-        		InEventDispatcher dispatch	= new InEventDispatcher( TEST_BUCKET_CAPACITY, eventThisIteration, p );
+        		//PersisterService<InEvent> p	= new InChroniclePersisterService(eventThisIteration, chronicleFileName);
+        		InEventDispatcher dispatch	= new InEventDispatcher( TEST_BUCKET_CAPACITY, eventThisIteration );
         		
         		System.out.println("");
         		LOGGER.info("Run: [{}], will feed [{}] events to Inbound dispatcher.", (run+1), eventThisIteration );
@@ -82,7 +93,7 @@ public final class InboundDispatcherPerformance{
 	     
         		avgObservedLatencyArray[run]= runLatencyTest( run, eventThisIteration, dispatch );
 	        
-        		sanityCheck( run, eventThisIteration, p, dispatch );
+        		sanityCheck( run, eventThisIteration, dispatch );
         		dispatch.stop();
         		
         		LOGGER.info("-----------------------------------------------------------------------------------------------------------{}", NEWLINE );
@@ -99,7 +110,7 @@ public final class InboundDispatcherPerformance{
         	       	
         }
         
-        double avgObserved_99Latency	= arraySum(avgObservedLatencyArray)/TEST_ITERATION;
+        double avgObserved_99Latency	= arraySum(avgObservedLatencyArray)/testIterations;
         LOGGER.info("99th Percentile Observed Latencies: {}", Arrays.toString( avgObservedLatencyArray) );
     	LOGGER.info("Avg 99th Percentile Latency :: Observed [{}], Expected:[{}].", avgObserved_99Latency, EXPECTED_AVG_LATENCY );
     	if( avgObserved_99Latency > EXPECTED_AVG_LATENCY ){
@@ -109,7 +120,7 @@ public final class InboundDispatcherPerformance{
 	}
 	       
     
-	private static void sanityCheck( int run, int eventCount, PersisterService<InEvent> p, InEventDispatcher dispatch ){
+	private static void sanityCheck( int run, int eventCount, InEventDispatcher dispatch ){
     	
     	int eventUnprocessed = dispatch.getQueueSize();
     	if( eventUnprocessed != 0 ){
@@ -118,8 +129,8 @@ public final class InboundDispatcherPerformance{
     	}
     	
     	//Inbound dispatcher compacts Market data events, there retrieved will never equal eventCount.
-    	int eventsRetrieved	= p.retrieveAll().size();
-    	LOGGER.warn("Run: [{}] Retrieved [{}] events from Chroncile.", run, eventsRetrieved );
+    	//int eventsRetrieved	= p.retrieveAll().size();
+    	//LOGGER.warn("Run: [{}] Retrieved [{}] events from Chroncile.", run, eventsRetrieved );
     	
     }
 	
@@ -161,13 +172,17 @@ public final class InboundDispatcherPerformance{
         
 		
 		@Override
-		public final boolean update( InEvent event ){
+		public final boolean inUpdate( InEvent event ){
 			histogram.recordValue( (System.nanoTime() - event.getCreationTime()) );
 			++eventsReceived;
 			
             return true;
 		}
 		
+		
+		public final int getEventsReceived( ){
+			return eventsReceived;
+		}
         
         public final double get99PercentileLatency( boolean fullReport, Logger logger ){
         	

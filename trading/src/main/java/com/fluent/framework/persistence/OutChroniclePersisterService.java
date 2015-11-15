@@ -15,13 +15,15 @@ import java.util.List;
 import com.fluent.framework.collection.*;
 import com.fluent.framework.config.ConfigManager;
 import com.fluent.framework.events.out.OutEvent;
+import com.fluent.framework.events.out.OutListener;
+import com.fluent.framework.events.out.OutType;
 import com.fluent.framework.util.FluentUtil;
 
 import static com.fluent.framework.util.FluentUtil.*;
 import static com.fluent.framework.util.FluentToolkit.*;
 
 
-public final class OutChroniclePersisterService implements Runnable, PersisterService<OutEvent>{
+public final class OutChroniclePersisterService implements Runnable, OutListener, PersisterService<OutEvent>{
 
 	private volatile boolean keepDispatching;
 	
@@ -65,6 +67,12 @@ public final class OutChroniclePersisterService implements Runnable, PersisterSe
     }
 
 	
+	@Override
+	public final boolean isSupported( OutType type ){
+		return ( OutType.WARM_UP_EVENT != type );
+	}
+	
+	
 	public final int getEventCount( ){
 		return eventCount;
 	}
@@ -102,13 +110,10 @@ public final class OutChroniclePersisterService implements Runnable, PersisterSe
 
     
     @Override
-    public final boolean persistEvent( OutEvent event ){
-    	if( event.getType().isPersistable() ){
-    		return eventQueue.offer( event );
-    	}
-    	
-    	return false;
-    }
+	public final boolean outUpdate( OutEvent event ){
+    	return eventQueue.offer( event );
+	}
+    
     
     
     protected static Chronicle createChronicle( int eventCount, String basePath ){

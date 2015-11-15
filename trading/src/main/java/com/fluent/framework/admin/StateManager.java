@@ -1,23 +1,21 @@
 package com.fluent.framework.admin;
 
 import org.slf4j.*;
-
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
-import com.fluent.framework.collection.FluentThreadFactory;
+import com.fluent.framework.collection.*;
 import com.fluent.framework.config.*;
 import com.fluent.framework.core.*;
+import com.fluent.framework.market.core.Exchange;
+import com.fluent.framework.market.core.ExchangeDetails;
 import com.fluent.framework.util.*;
-import com.fluent.framework.core.FluentContext.Environment;
 import com.fluent.framework.core.FluentContext.FluentState;
 import com.fluent.framework.events.in.InEvent;
 import com.fluent.framework.events.in.InEventDispatcher;
 
 import static java.util.concurrent.TimeUnit.*;
-import static com.fluent.framework.util.FluentUtil.*;
-import static com.fluent.framework.util.FluentToolkit.*;
-import static com.fluent.framework.core.FluentContext.*;
 import static com.fluent.framework.core.FluentContext.FluentState.*;
 
 
@@ -28,8 +26,10 @@ public final class StateManager implements Runnable, FluentService{
 	private final int delay;
 	private final TimeUnit unit;
 	private final ConfigManager config;
+	
 	private final InEventDispatcher inDispatcher;
 	private final ScheduledExecutorService service;
+	private final Map<Exchange, Set<TimedTask>> eTaskStatus;
 		
 	private final static AtomicReference<FluentState> APP_STATE;
 	
@@ -55,6 +55,7 @@ public final class StateManager implements Runnable, FluentService{
     	this.unit			= unit;
     	this.config			= config;
     	this.inDispatcher	= inDispatcher;
+    	this.eTaskStatus	= new HashMap<>( );
     	this.service		= Executors.newSingleThreadScheduledExecutor( new FluentThreadFactory(NAME) );
         
     }
@@ -67,11 +68,32 @@ public final class StateManager implements Runnable, FluentService{
 	}
 
 	
+	public static final boolean isRunning( ){
+		return ( FluentState.RUNNING  == getState() );
+	}
+	
+
+	public static final FluentState getState( ){
+		return APP_STATE.get();
+	}
+
+
+	public static final FluentState setState( FluentState newState ){
+		return APP_STATE.getAndSet( newState );
+	}
+	
+	
 	@Override
 	public final void start( ){
+		
+		for( ExchangeDetails details : config.getExchangeDetailsMap().values() ){
+			eTaskStatus.put(details.getExchange(), new HashSet<TimedTask>() );
+		}
+		
 		keepRunning = true;
 		service.scheduleAtFixedRate( this, delay, delay, unit );
-		LOGGER.info("Successfully started Application state manager, generating Metronome events every {} {}.", delay, unit );
+		LOGGER.info("Monitoring Exchanges {}.", config.getExchangeDetailsMap().values()  );
+		LOGGER.info("STARTED will publish Metronome events every {} {}.", delay, unit );
 	
 	}
 	
@@ -81,94 +103,64 @@ public final class StateManager implements Runnable, FluentService{
 		
 		if( keepRunning ){
 			sendMetronomeEvent( );
+			checkExchangeClosingTasks();
 		}
 	
 	}
 
 	
 	protected final void sendMetronomeEvent( ){
-		long secondsToClose		 = getSecondsToClose( );
-		InEvent metro = new MetronomeEvent( secondsToClose );
 		
-		inDispatcher.enqueue( metro );
-	}
-	
-	
-	protected final long getSecondsToClose( ){
-		
-		long closeSeconds	= ZERO;
-		
-		try{
-		
-			long nowMillis 		= TimeUtil.currentMillis( );
-			long closeMillis 	= config.getAppCloseTime();
-			long timeRemaining 	= closeMillis - nowMillis;
-			closeSeconds		= SECONDS.convert(timeRemaining, MILLISECONDS);
-			
-		}catch( Exception e ){
-			LOGGER.info("Exception: ", e);
-		}
-		
-		return closeSeconds;
-	}
-	
-	
-	public final boolean isWithinTradingDay( ){
-		return isWithinTradingDay( TimeUtil.currentMillis() );
-	}
-	
-	
-	protected final boolean isWithinTradingDay( long nowMillis ){
-		
+		long nowMillis 		= TimeUtil.currentMillis();
 		long openMillis 	= config.getAppOpenTime();
 		long closeMillis 	= config.getAppCloseTime();
+		TimedTask timeTask	= TimedTask.getTask(nowMillis, openMillis, closeMillis );
+		boolean isAppClose	= timeTask.isClosing();
 		
-		return ( openMillis < nowMillis && nowMillis < closeMillis );
-	}
-	
-	
-	public static final boolean isProd( ){
-        return ( Environment.PROD == getEnvironment() );
-    }
-	
-	
-	public static final boolean isRunning( ){
-		return ( FluentState.RUNNING  == getState() );
-	}
+		InEvent event 		= null;
+		if( isAppClose ){
+			event 	= new AdminClosingEvent(Exchange.ALL, TimedTask.CLOSING_TIME);
+		}else{
+			event 	= new MetronomeEvent();
+		}
 		
-	
-	public static final FluentState getState( ){
-		return APP_STATE.get();
+		LOGGER.info("{}", event );
+		inDispatcher.enqueue( event );
+		
 	}
 	
 	
-	public static final FluentState setState( FluentState newState ){
-		return APP_STATE.getAndSet( newState );
+	protected final void checkExchangeClosingTasks( ){
+		
+		for( ExchangeDetails details : config.getExchangeDetailsMap().values() ){
+			
+			//Check if Exchange is closing
+			Exchange exchange	= details.getExchange();
+			Set<TimedTask> tSet	= eTaskStatus.get( exchange );
+			if( tSet == null ){
+				LOGGER.warn("Closing time isn't configured for Exchange [{}].", exchange);
+				continue;
+			}
+				
+			long nowMillis 		= TimeUtil.currentMillis();
+			TimedTask timeTask	= TimedTask.getTask(nowMillis, details.getOpenMillis(), details.getCloseMillis() );
+			boolean isClosing	= timeTask.isClosing();
+			if( !isClosing ) continue;
+				
+			boolean alreadySent	= tSet.contains(timeTask);
+			if( alreadySent ) continue;
+				
+			AdminClosingEvent event= new AdminClosingEvent( exchange, timeTask );
+			tSet.add( timeTask );
+			inDispatcher.enqueue(event);
+				
+			LOGGER.info("Sent closing time event [{}].", event);
+				
+		}
+		
 	}
 	
-	
-	public final static String getFrameworkInfo( ){
 
-        StringBuilder builder  = new StringBuilder( TWO * SIXTY_FOUR );
-        
-        builder.append( L_BRACKET );
-        builder.append( "Environment:" ).append( getEnvironment() );
-        builder.append( ", Region:" ).append( getRegion() );
-        builder.append( ", Instance:" ).append( getInstance() );
-        builder.append( ", State:" ).append( getState() );
-        builder.append( ", Process:" ).append( getFullProcessName() );
-        builder.append( R_BRACKET );
-
-        return builder.toString();
-
-    }
-	
-
-	@Override
-	public final String toString( ){
-		return getFrameworkInfo();
-	}
-	
 
 	@Override
 	public final void stop( ){

@@ -23,36 +23,98 @@ public final class TimeUtil{
     }
     
     
-    public final static long parseTime( String section, String name, String timeAsString ){
+    public final static TimeZone parseTimeZone( String timeZoneStr ) throws Exception{
+
+    	TimeZone timeZone	= TimeZone.getTimeZone(timeZoneStr);
+		if( !timeZone.getID().equals(timeZoneStr) ){
+			throw new Exception("TimeZone [" + timeZoneStr + "] is invalid.");
+		}
     	
-    	if( timeAsString == null ){
-    		throw new RuntimeException( name + " must be specified under " + section + " as HH:mm:ss." );
-    	}
-    	
-    	String[] timeTokens 	= timeAsString.trim().split( COLON );
-    	if( timeTokens.length < THREE ){
-    		throw new RuntimeException("Invalid time format of " + name + " = " + timeAsString + " (must be in HH:mm:ss)" );	
-    	}
-    	
-    	long timeInMillis 		= ZERO;
-    	
-    	try{
-    		Calendar calendar	= Calendar.getInstance( TimeZone.getDefault() );
-    		calendar.set( Calendar.HOUR_OF_DAY, Integer.parseInt(timeTokens[ZERO]));
-    		calendar.set( Calendar.MINUTE, 		Integer.parseInt(timeTokens[ONE]));
-    		calendar.set( Calendar.SECOND, 		Integer.parseInt(timeTokens[TWO]));
-    		calendar.set( Calendar.MILLISECOND,	ZERO);
-    
-    		timeInMillis		= calendar.getTimeInMillis();
-    		
-    	}catch( Exception e ){
-    		throw new RuntimeException("Failed to parse time format of name: " + name  + ", " + timeAsString, e);
-    	}
-    	
-        return timeInMillis;
-    
+		return timeZone;
     }
     
+    
+    public final static boolean isOpen( long nowMillis, long openMillis, long closeMillis ){
+    	return ( nowMillis > openMillis && nowMillis < closeMillis);
+    }
+    
+    
+    public final static long getAdjustedOpen( String open, String close, TimeZone tZone, long nowMillis ){
+    	
+    	long openTimeInMillis		= getTimeInMillis( open, tZone );
+    	long closeTimeInMillis		= getTimeInMillis( close, tZone );
+    	boolean openLessThanClose 	= openTimeInMillis <= closeTimeInMillis;
+    	
+    	//Regular Case: Open is less than close (Open close happens on the same day)
+    	//Open: 09:00:00 - Close: 17:00:00
+    	if( openLessThanClose ) return openTimeInMillis;
+    	
+    	//Irregular Case: Open is greater than close
+    	//Is time right now before close?
+    	//If yes, that means Open was yesterday
+    	//Open: 09:00:00 - Close: 17:00:00
+    	
+    	boolean nowBeforeClose 		= ( nowMillis < closeTimeInMillis );
+    	if( nowBeforeClose ){
+    		return openTimeInMillis - _24_HOURS_IN_MILLIS;
+    	}
+    	
+    	return openTimeInMillis;
+    }
+    
+    
+    public final static long getAdjustedClose( String open, String close, TimeZone tZone, long nowMillis ){
+    	
+    	long openTimeInMillis		= getTimeInMillis( open, tZone );
+    	long closeTimeInMillis		= getTimeInMillis( close, tZone );
+    	boolean openLessThanClose 	= openTimeInMillis <= closeTimeInMillis;
+    	
+    	//Regular Case: Open is less than close (Open close happens on the same day)
+    	//Open: 09:00:00 - Close: 17:00:00
+    	if( openLessThanClose ) return closeTimeInMillis;
+    	
+    	//Irregular Case: Open is greater than close (close time happens the next day)
+    	//Is time right now after close?
+    	//If yes, that means close is tomorrow
+    	//Open: 18:00:00 - Close: 16:00:00, Now: 17:00:00 
+    	
+    	boolean nowAfterClose 		= ( nowMillis > closeTimeInMillis );
+    	if( nowAfterClose ){
+    		return closeTimeInMillis + _24_HOURS_IN_MILLIS;
+    	}
+    	
+    	return closeTimeInMillis;
+    }
+    
+    
+    
+    public final static long getTimeInMillis( String timeStr, TimeZone tZone ){
+    		
+    	long timeInMilliseconds = ZERO;
+    
+    	try{
+    		
+    		String[] splitTokens= timeStr.trim().split(COLON);
+    		if( splitTokens.length != THREE ){
+    			throw new RuntimeException("Invalid time format! Time " + timeStr + " must be in HH:MM:SS format");
+    		}
+    	
+    		Calendar calendar	= Calendar.getInstance( tZone );
+    		calendar.set( Calendar.HOUR_OF_DAY, Integer.parseInt(splitTokens[ZERO]));
+    		calendar.set( Calendar.MINUTE, 		Integer.parseInt(splitTokens[ONE]));
+    		calendar.set( Calendar.SECOND, 		Integer.parseInt(splitTokens[TWO]));
+    		calendar.set( Calendar.MILLISECOND, ZERO);
+    		
+    		timeInMilliseconds	= calendar.getTimeInMillis();
+    	
+    	}catch( Exception e ){
+    		throw new RuntimeException("Failed to parse time " + timeStr, e );
+    	}
+    	
+    	return timeInMilliseconds;
+	}
+
+  
     
 
 }

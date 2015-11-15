@@ -12,7 +12,7 @@ import java.util.concurrent.*;
 import com.fluent.framework.collection.FluentThreadFactory;
 
 
-public class ReliableDealerTransport extends AbstractTransport implements Runnable{
+public class ReliableDealerTransport extends AbstractJMQTransport implements Runnable{
 
     private volatile boolean isAlive;
 
@@ -22,7 +22,7 @@ public class ReliableDealerTransport extends AbstractTransport implements Runnab
 
     private final ExecutorService service;
 
-    private final static String NAME    = AbstractTransport.class.getSimpleName();
+    private final static String NAME    = AbstractJMQTransport.class.getSimpleName();
     private final static Logger LOGGER  = LoggerFactory.getLogger( NAME );
 
 

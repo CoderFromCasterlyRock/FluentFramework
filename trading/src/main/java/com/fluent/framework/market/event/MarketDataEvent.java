@@ -1,19 +1,20 @@
-package com.fluent.framework.market;
+package com.fluent.framework.market.event;
 
-import com.eclipsesource.json.*;
 import com.fluent.framework.events.in.*;
+import com.fluent.framework.market.core.Exchange;
+import com.fluent.framework.market.core.InstrumentSubType;
+import com.fluent.framework.market.core.InstrumentType;
 
 import static com.fluent.framework.util.FluentUtil.*;
 import static com.fluent.framework.events.in.InType.*;
-import static com.fluent.framework.events.core.FluentJsonTags.*;
 
 
 public final class MarketDataEvent extends InEvent{
 
-	private final String eventId;
 	private final Exchange exchange;
     private final String symbol;
-    
+    private final InstrumentSubType subType;
+        
     private final double bid;
     private final int bidSize;
     private final double ask;
@@ -22,12 +23,12 @@ public final class MarketDataEvent extends InEvent{
     private final static long serialVersionUID = 1l;
     
     
-    public MarketDataEvent( Exchange exchange, String symbol, double bid, int bidSize, double ask, int askSize ){
+    public MarketDataEvent( Exchange exchange, InstrumentSubType subType, String symbol, double bid, int bidSize, double ask, int askSize ){
     	
     	super( MARKET_DATA );
 
-    	this.eventId	= exchange + DOT + symbol + DOT + getSequenceId();
         this.exchange	= exchange;
+        this.subType	= subType;
         this.symbol   	= symbol;
         
         this.bid      	= bid;
@@ -38,11 +39,6 @@ public final class MarketDataEvent extends InEvent{
     }
 
 
-    @Override
-    public final String getEventId( ){
-        return eventId;
-    }
-
     public final String getSymbol( ){
         return symbol;
     }
@@ -51,6 +47,17 @@ public final class MarketDataEvent extends InEvent{
     public final Exchange getExchange( ){
         return exchange;
     }
+    
+    
+    public final InstrumentType getInstrumentType( ){
+        return subType.getType();
+    }
+    
+    
+    public final InstrumentSubType getInstrumentSubType( ){
+        return subType;
+    }
+    
 
 
     public final double getBid( ){
@@ -71,24 +78,12 @@ public final class MarketDataEvent extends InEvent{
     public final int getAskSize( ){
         return askSize;
     }
-
-        
-    @Override
-    protected final void toJSON( JsonObject object ){
-
-        object.add( EXCHANGE.field(),	exchange.name() );
-        object.add( SYMBOL.field(),		symbol );
-        object.add( BID.field(),        bid );
-        object.add( BIDSIZE.field(),    bidSize );
-        object.add( ASK.field(),        ask );
-        object.add( ASKSIZE.field(),    askSize );
-
-    }
-   
+  
     
     public final String toCompactString( ){
 
     	StringBuilder builder = new StringBuilder( );
+    	builder.append( symbol ).append( COLON );
     	builder.append( bidSize ).append( X_SPACE ).append( bid );
     	builder.append( TAB );
     	builder.append( askSize ).append( X_SPACE ).append( ask );
@@ -98,17 +93,14 @@ public final class MarketDataEvent extends InEvent{
     
     
     @Override
-    public final String toString( ){
-
-    	StringBuilder builder = new StringBuilder( );
-    	builder.append( eventId ).append( COMMA );
-    	builder.append( getType() ).append( COMMA );
+    public final void toEventString( StringBuilder builder ){
     	builder.append( symbol ).append( COMMA );
     	builder.append( bidSize ).append( X_SPACE ).append( bid );
     	builder.append( TAB );
     	builder.append( askSize ).append( X_SPACE ).append( ask );
+    	builder.append( TAB );
+    	builder.append( subType );
     	
-        return builder.toString();
     }
    
 

@@ -12,7 +12,7 @@ import com.fluent.framework.core.*;
 import static com.fluent.framework.util.FluentUtil.*;
 
 
-public abstract class AbstractTransport implements FluentService{
+public abstract class AbstractJMQTransport implements FluentService{
 
     private volatile boolean toLog;
     private final Set<ZListener<ZMsg>> listeners;
@@ -21,11 +21,11 @@ public abstract class AbstractTransport implements FluentService{
     private final int timeToLinger;
     private final int highWaterMark;
 
-    private final static String NAME    = AbstractTransport.class.getSimpleName();
+    private final static String NAME    = AbstractJMQTransport.class.getSimpleName();
     private final static Logger LOGGER  = LoggerFactory.getLogger( NAME );
 
 
-    public AbstractTransport( boolean toLog, int timeToLinger, int highWaterMark, ZContext context ){
+    public AbstractJMQTransport( boolean toLog, int timeToLinger, int highWaterMark, ZContext context ){
         this.toLog    		= toLog;
         this.timeToLinger   = timeToLinger;
         this.highWaterMark  = highWaterMark;

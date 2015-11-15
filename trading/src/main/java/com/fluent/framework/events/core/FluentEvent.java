@@ -1,7 +1,6 @@
 package com.fluent.framework.events.core;
 
 import java.io.Serializable;
-import com.eclipsesource.json.*;
 import com.fluent.framework.collection.*;
 
 import static com.fluent.framework.util.TimeUtil.*;
@@ -12,75 +11,82 @@ import static com.fluent.framework.events.core.FluentJsonTags.*;
 public abstract class FluentEvent implements Serializable{
 
 	private final long sequenceId;
-    private final long timeCreated;
+            
+    private volatile long[] timestamps;
 
 	private final static long serialVersionUID 			= 1l;
 	private final static FluentAtomicLong SEQUENCE_GEN 	= new FluentAtomicLong( ZERO );
 
     protected FluentEvent( ){
-    	this.timeCreated	= currentNanos();
     	this.sequenceId		= SEQUENCE_GEN.getAndIncrement();
+    	this.timestamps		= new long[]{ currentNanos(), ZERO, ZERO, ZERO };
     }
     
     
-    public abstract String getEventId( );
     public abstract FluentEventType getType();
-    protected abstract void toJSON( JsonObject object );
-
-
+    public abstract void toEventString( StringBuilder builder );
+    
+    
     public final long getSequenceId( ){
         return sequenceId;
     }
 
     
     public final long getCreationTime( ){
-        return timeCreated;
+        return timestamps[ZERO];
     }
+    
+    
+    public final void setDispatchTime( ){
+    	timestamps[ONE] = currentNanos();
+    }
+    
+    
+    public final void setConsumedTime( ){
+    	timestamps[TWO] = currentNanos();
+    }
+    
+    
+    public final void setAdaptorTime( ){
+        timestamps[THREE] = currentNanos();
+    }
+    
 
     
+    public final String getEventId( ){
+    	return getType() + UNDERSCORE + sequenceId;
+    }
+    
+    
     public final boolean isIncoming( ){
-        return getCategory().isEventInput();
+        return getType().isIncoming();
     }
-    
-    
-    public final FluentEventCategory getCategory( ){
-        return getType().getCategory();
-    }
-    
+        
     
     /*
     protected final long getNextId( ){
     	boolean isWarmingUp = ( WARMING_UP == FluentStateManager.getState() );
     	return ( isWarmingUp ) ? SEQUENCE_GEN.get() : SEQUENCE_GEN.getAndIncrement(); 
     }
-     */ 
-    
-    
-    public final String toJSON( ){
-    	
-    	JsonObject object = new JsonObject( );
-    	
-        //Header
-        object.add( EVENT_ID.field(),       	getEventId() );
-        object.add( EVENT_TYPE.field(),     	getType().getName() );
-        object.add( TIMESTAMP.field(),          timeCreated );
-        object.add( SEQUENCE.field(),       	sequenceId );
+    */
         
-        toJSON( object );
-
-        //Footer
-        object.add( EVENT_CATEGORY.field(), 	getCategory().name() );
-        
-
-        return object.toString();
-        
-    }
-    
     
     @Override
-    public String toString(){
-    	return toJSON();
+    public final String toString( ){
+    	
+    	StringBuilder builder = new StringBuilder( EIGHT * SIXTY_FOUR );
+    	
+        //Header
+    	toEventString( builder );
+
+        //Footer
+    	builder.append( SEQUENCE ).append( COLON).append( sequenceId ).append( COMMASP );
+    	builder.append( EVENT_TYPE ).append( COLON).append( getType() );
+    	
+    	
+        return builder.toString();
+        
     }
-    
+        
 
 }

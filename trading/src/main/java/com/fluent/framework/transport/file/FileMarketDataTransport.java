@@ -1,17 +1,15 @@
 package com.fluent.framework.transport.file;
 
 import java.io.*;
-
 import org.slf4j.*;
-
 import java.util.*;
 import java.util.concurrent.*;
 
-import com.fluent.framework.collection.FluentThreadFactory;
+import com.fluent.framework.collection.*;
 import com.fluent.framework.transport.core.*;
 
 import static com.fluent.framework.util.FluentUtil.*;
-import static com.fluent.framework.util.FluentPreconditions.*;
+import static com.fluent.framework.util.FluentToolkit.*;
 
 
 public final class FileMarketDataTransport extends AbstractTransport implements Runnable{
@@ -23,7 +21,7 @@ public final class FileMarketDataTransport extends AbstractTransport implements 
 	private final TimeUnit timeUnit;
 	private final List<String> dataList;
 	private final ScheduledExecutorService executor;
-	
+		
 	private final static int DEFAULT_FREQUENCY		= ONE; 
 	private final static TimeUnit DEFAULT_TIMEUNIT	= TimeUnit.SECONDS;
 	private final static String NAME				= FileMarketDataTransport.class.getSimpleName();
@@ -51,14 +49,14 @@ public final class FileMarketDataTransport extends AbstractTransport implements 
 	public final String name( ){
 		return NAME;
 	}
-
+	
 	
 	@Override
 	public final boolean isConnected( ){
 		return true;
 	}
-	
-	
+		
+
 	@Override
 	public final void start( ){
 		executor.scheduleAtFixedRate( this, frequency, 5*frequency, timeUnit);

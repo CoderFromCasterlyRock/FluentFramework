@@ -6,6 +6,6 @@ public interface OutListener{
 
 	public String name( );
     public boolean isSupported( OutType type );
-    public boolean update( OutEvent event );
+    public boolean outUpdate( OutEvent event );
 
 }

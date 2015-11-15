@@ -1,52 +1,36 @@
 package com.fluent.framework.core;
 
 import java.util.Arrays;
+import com.typesafe.config.Config;
+import com.fluent.framework.config.*;
 
 import static com.fluent.framework.util.FluentUtil.*;
-import static com.fluent.framework.util.FluentToolkit.*;
+
 
 public final class FluentContext{
 	
 	
-	public final static String getInstance( ){
-		return Instance.getName();
-	}
+	public enum Role{
 	
-	
-	public final static Region getRegion( ){
-        return Region.getRegion();
-    }
-
-	
-	public final static Environment getEnvironment( ){
-        return Environment.getEnvironment();
-    }
-	
-	
-	
-	public enum Instance{
-	
-		NAME;
+		PRIMARY,
+		SECONDARY;
 		
-		public static String getName( ){
+		public static Role getRole( Config configuration ){
 
-			String prop		= "fluent.framework.instance";
-			String name		= System.getProperty( prop );
-                
-			if( isBlank(name) ){
-               	StringBuilder usage = new StringBuilder( TWO * SIXTY_FOUR );
-               	usage.append( "[ERROR while starting Fluent Framework]" );
-               	usage.append( NEWLINE );
-               	usage.append( prop ).append( COLON ).append( name ).append(" is NOT valid!");
-               	usage.append( NEWLINE );
-               	usage.append( "Must specify Application name as a VM argument (-D): " );
-               	usage.append( NEWLINE );
+			Role role	    = null;
+        	String name     = EMPTY;
+            String prop     = "role";
+            String path     = ConfigManager.FRAMEWORK_SECTION_KEY;
 
-               	System.err.println( usage.toString() );
-                System.exit( ONE );
+            try{
+            	name    = configuration.getString( path + prop );
+                role	= Role.valueOf( name );
+
+            }catch( Exception e ){
+                printUsageAndExit( prop, name, path, Arrays.deepToString( Role.values() ) );
             }
 
-    		return name;
+            return role;
 		}
 		
 
@@ -60,17 +44,19 @@ public final class FluentContext{
         CHI,
         LON;
 
-        public static Region getRegion( ){
-            String name     = EMPTY;
-            Region region   = null;
-            String prop     = "fluent.framework.region";
+        public static Region getRegion( Config configuration ){
+            
+        	Region region   = null;
+        	String name     = EMPTY;
+            String prop     = "region";
+            String path     = ConfigManager.FRAMEWORK_SECTION_KEY;
 
             try{
-                name    = System.getProperty( prop );
+            	name    = configuration.getString( path + prop );
                 region  = Region.valueOf( name );
 
             }catch( Exception e ){
-                printUsageAndExit( prop, name, Arrays.deepToString( Region.values() ) );
+                printUsageAndExit( prop, name, path, Arrays.deepToString( Region.values() ) );
             }
 
             return region;
@@ -86,17 +72,19 @@ public final class FluentContext{
         UAT,
         PROD;
 
-        public static Environment getEnvironment( ){
-            String name         = EMPTY;
-            Environment env     = null;
-            String prop         = "fluent.framework.environment";
+        public static Environment getEnvironment( Config configuration ){
+            
+        	Environment env     = null;
+        	String name         = EMPTY;
+            String prop         = "environment";
+            String path     	= ConfigManager.FRAMEWORK_SECTION_KEY;
 
             try{
-                name    = System.getProperty( prop );
+                name    = configuration.getString( path + prop );
                 env		= Environment.valueOf( name );
 
             }catch( Exception e ){
-                printUsageAndExit( prop, name, Arrays.deepToString( Environment.values() ) );
+                printUsageAndExit( prop, name, path, Arrays.deepToString( Environment.values() ) );
             }
 
             return env;
@@ -128,14 +116,15 @@ public final class FluentContext{
 	}
 	
 	
-    private final static void printUsageAndExit( String propName, String propValue, String choices ){
+    private final static void printUsageAndExit( String propName, String propValue, String propLocation, String choices ){
 
         StringBuilder usage = new StringBuilder( TWO * SIXTY_FOUR );
         usage.append( "[ERROR while starting Fluent Framework]" );
         usage.append( NEWLINE );
         usage.append( propName ).append( COLON ).append( propValue ).append(" is NOT valid!");
         usage.append( NEWLINE );
-        usage.append( "Must specify one of these as a VM argument (-D): " ).append( choices );
+        usage.append( "Must specify " ).append( propLocation ).append( propName );
+        usage.append( " = " ).append( choices );
         usage.append( NEWLINE );
 
         System.err.println( usage.toString() );
