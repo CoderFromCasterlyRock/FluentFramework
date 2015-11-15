@@ -1,8 +1,10 @@
 package com.fluent.framework.events.out;
 
 import org.slf4j.*;
+
 import java.util.*;
 import java.util.concurrent.*;
+
 import uk.co.real_logic.agrona.concurrent.*;
 
 import com.fluent.framework.core.*;
@@ -42,11 +44,11 @@ public final class OutEventDispatcher implements FluentService, Runnable{
     			
     }
 
-   
+    
     @Override
-    public final String name( ){
-    	return NAME;
-    }
+	public final FluentServiceType getServiceType( ){
+		return FluentServiceType.OUT_DISPATCHER;
+	}
     
     
     public final int getQueueSize( ){

@@ -7,7 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.cliffc.high_scale_lib.*;
 
 import com.fluent.framework.config.ConfigManager;
+import com.fluent.framework.core.FluentLifecycle;
 import com.fluent.framework.core.FluentService;
+import com.fluent.framework.core.FluentServiceType;
 import com.fluent.framework.events.in.InEvent;
 import com.fluent.framework.events.in.InEventDispatcher;
 import com.fluent.framework.events.in.InType;
@@ -56,6 +58,11 @@ public final class MarketDataManager implements FluentService, OutListener, Mark
 		return NAME;
 	}
 	
+	
+	@Override
+	public final FluentServiceType getServiceType( ){
+		return FluentServiceType.MARKET_DATA_MANAGER;
+	}
 	
 	@Override
 	public final boolean isSupported( OutType type ){

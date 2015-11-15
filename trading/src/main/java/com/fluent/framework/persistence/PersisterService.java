@@ -6,7 +6,7 @@ import com.fluent.framework.core.*;
 import com.fluent.framework.events.core.FluentEvent;
 
 
-public interface PersisterService<E extends FluentEvent> extends FluentService{
+public interface PersisterService<E extends FluentEvent> extends FluentLifecycle{
 
     public List<E> retrieveAll( );
     

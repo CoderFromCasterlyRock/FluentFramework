@@ -7,7 +7,7 @@ import org.nustaq.offheap.FSTLongOffheapMap;
 import org.nustaq.serialization.simpleapi.DefaultCoder;
 import org.nustaq.serialization.simpleapi.FSTCoder;
 
-import com.fluent.framework.core.FluentService;
+import com.fluent.framework.core.FluentLifecycle;
 import com.fluent.framework.events.core.*;
 import com.fluent.framework.events.in.InEvent;
 import com.fluent.framework.events.out.OutEvent;
@@ -15,7 +15,7 @@ import com.fluent.framework.events.out.OutEvent;
 import static com.fluent.framework.util.FluentUtil.*;
 
 
-public final class EventFstPersister implements FluentService{
+public final class EventFstPersister implements FluentLifecycle{
 
 	private final String fileName;
 	private final int eventCount;

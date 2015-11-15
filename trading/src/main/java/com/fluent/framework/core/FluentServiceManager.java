@@ -6,7 +6,7 @@ import com.fluent.framework.events.out.*;
 import com.fluent.framework.market.adaptor.MarketDataManager;
 
 
-public final class FluentServices{
+public final class FluentServiceManager{
 
 	private final ConfigManager cfgManager;
 	private final InEventDispatcher inDispatcher;
@@ -14,7 +14,7 @@ public final class FluentServices{
 	private final MarketDataManager mdManager;
 	
 	
-	public FluentServices(ConfigManager cfgManager, InEventDispatcher inDispatcher, OutEventDispatcher outDispatcher, MarketDataManager mdManager) {
+	public FluentServiceManager( ConfigManager cfgManager, InEventDispatcher inDispatcher, OutEventDispatcher outDispatcher, MarketDataManager mdManager) {
 		
 		this.cfgManager 	= cfgManager;
 		this.inDispatcher 	= inDispatcher;

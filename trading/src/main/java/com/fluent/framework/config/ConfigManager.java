@@ -1,9 +1,12 @@
 package com.fluent.framework.config;
 
 import java.util.*;
-
+import org.slf4j.*;
 import com.typesafe.config.*;
+
 import com.fluent.framework.admin.StateManager;
+import com.fluent.framework.core.FluentServiceType;
+import com.fluent.framework.core.FluentService;
 import com.fluent.framework.core.FluentContext.*;
 import com.fluent.framework.market.core.Exchange;
 import com.fluent.framework.market.core.ExchangeDetails;
@@ -13,7 +16,7 @@ import static com.fluent.framework.util.FluentUtil.*;
 import static com.fluent.framework.util.FluentToolkit.*;
 
 
-public final class ConfigManager{
+public final class ConfigManager implements FluentService{
 	
 	private final Region region;
 	private final Environment environment;
@@ -41,6 +44,10 @@ public final class ConfigManager{
 	private final static String APP_TIMEZONE_KEY		= FRAMEWORK_SECTION_KEY + "timeZone";
 	
 	
+    private final static String NAME        = ConfigManager.class.getSimpleName();
+    private final static Logger LOGGER      = LoggerFactory.getLogger( NAME );
+
+
 	public ConfigManager( String configFileName ) throws Exception{
 	
 		this.configFileName		= notBlank(configFileName, "Config file name is invalid.");
@@ -61,6 +68,18 @@ public final class ConfigManager{
 		
 	}
 
+	
+	@Override
+	public final FluentServiceType getServiceType( ){
+		return FluentServiceType.CONFIG_MANAGER;
+	}
+	
+	
+	@Override
+	public final void start( ){
+		//verify all the necessary params
+		LOGGER.info("Successfully started [{}]", getServiceType() );
+	}
 	
 	public final Role getRole( ){
 		return role;
@@ -124,7 +143,7 @@ public final class ConfigManager{
 	
 	public final Map<Exchange, ExchangeDetails> getExchangeMap(){
 		return exchangeMap;
-	};
+	}
 	
 	
 	protected final Config getConfig( ){
@@ -196,6 +215,11 @@ public final class ConfigManager{
 	
 	public final Set<Config> getMarketDataAdaptorConfigs(){
 		return Collections.emptySet();
+	}
+	
+	
+	@Override
+	public final void stop( ){
 	}
 	
 	

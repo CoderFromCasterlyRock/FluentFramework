@@ -10,7 +10,7 @@ import com.fluent.framework.market.core.*;
 import com.fluent.framework.reference.ReferenceDataEvent;
 
 
-public abstract class MarketDataAdapter implements FluentDataListener, FluentService{
+public abstract class MarketDataAdapter implements FluentDataListener, FluentLifecycle{
 	
 	private final Exchange[] exchanges;
 	private final MarketDataProvider provider;

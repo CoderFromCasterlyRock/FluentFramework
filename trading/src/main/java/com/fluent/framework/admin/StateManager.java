@@ -19,7 +19,7 @@ import static java.util.concurrent.TimeUnit.*;
 import static com.fluent.framework.core.FluentContext.FluentState.*;
 
 
-public final class StateManager implements Runnable, FluentService{
+public final class StateManager implements Runnable, FluentLifecycle{
 
 	private volatile boolean keepRunning;
 	

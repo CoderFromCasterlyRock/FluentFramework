@@ -3,7 +3,7 @@ package com.fluent.framework.transport.jeromq.transport;
 import org.zeromq.ZContext;
 import org.zeromq.ZMsg;
 
-import com.fluent.framework.core.FluentService;
+import com.fluent.framework.core.FluentLifecycle;
 import com.fluent.framework.transport.jeromq.transport.ReliablePublisherTransport;
 import com.fluent.framework.transport.jeromq.transport.ReliableSubscriberTransport;
 import com.fluent.framework.transport.jeromq.transport.ZListener;
@@ -12,7 +12,7 @@ import com.fluent.framework.transport.jeromq.transport.ZListener;
 public class TestPublisherSubscriber{
 	
 	
-	private class TestSubscriber implements ZListener<ZMsg>, FluentService{
+	private class TestSubscriber implements ZListener<ZMsg>, FluentLifecycle{
 	
 		private final ReliableSubscriberTransport subscriber;
 		
@@ -43,7 +43,7 @@ public class TestPublisherSubscriber{
 	}
 	
 	
-	private class TestPublisher implements FluentService{
+	private class TestPublisher implements FluentLifecycle{
 		
 		private final ReliablePublisherTransport publisher;
 		

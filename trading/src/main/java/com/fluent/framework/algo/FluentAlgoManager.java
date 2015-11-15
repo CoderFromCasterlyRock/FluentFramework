@@ -1,21 +1,22 @@
 package com.fluent.framework.algo;
 
 import org.slf4j.*;
+
 import com.fluent.framework.admin.*;
 import com.fluent.framework.core.*;
 import com.fluent.framework.events.in.*;
 
 
-public abstract class FluentAlgoManager implements InListener, FluentService{
+public abstract class FluentAlgoManager implements InListener, FluentLifecycle{
 
 	private final String name;
-	private final FluentServices services;
+	private final FluentServiceManager services;
 	
     private final static String NAME        = FluentAlgoManager.class.getSimpleName();
     private final static Logger LOGGER      = LoggerFactory.getLogger( NAME );
 
 
-    public FluentAlgoManager( String name, FluentServices services ){
+    public FluentAlgoManager( String name, FluentServiceManager services ){
         this.name	 	= name;
     	this.services	= services;
     }

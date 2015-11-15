@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.*;
 import com.fluent.framework.core.*;
 
 
-public final class FluentSingleThreadExecutor implements FluentService, ExecutorService{
+public final class FluentSingleThreadExecutor implements FluentLifecycle, ExecutorService{
 
 	private volatile boolean running;
     private volatile boolean stopped;

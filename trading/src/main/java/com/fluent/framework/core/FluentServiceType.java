@@ -1,0 +1,16 @@
+package com.fluent.framework.core;
+
+
+public enum FluentServiceType{
+	
+	CONFIG_MANAGER,
+	IN_DISPATCHER,
+	IN_PERSISTER,
+	MARKET_DATA_MANAGER,
+	REFERENCE_DATA_MANAGER,
+	ORDER_MANAGER,
+	OUT_PERSISTER,
+	OUT_DISPATCHER,
+	EXECUTION_MANAGER;
+
+}

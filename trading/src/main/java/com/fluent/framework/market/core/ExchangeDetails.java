@@ -111,7 +111,7 @@ public final class ExchangeDetails{
 		builder.append("[Exchange=").append(exchange);
 		builder.append(", Open=").append(openTime);
 		builder.append(", Close=").append(closeTime);
-		builder.append(", TimeZone=").append(timeZone);
+		builder.append(", TimeZone=").append(timeZone.getID());
 		builder.append(", SpeedLimit/sec=").append(speedLimit);
 		builder.append("]");
 		

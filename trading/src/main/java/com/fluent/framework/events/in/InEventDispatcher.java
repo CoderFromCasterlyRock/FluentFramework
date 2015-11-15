@@ -1,13 +1,14 @@
 package com.fluent.framework.events.in;
 
 import org.slf4j.*;
+
 import java.util.*;
 import java.util.concurrent.*;
 
 import com.fluent.framework.core.*;
 import com.fluent.framework.collection.*;
-import uk.co.real_logic.agrona.concurrent.*;
 
+import uk.co.real_logic.agrona.concurrent.*;
 import static com.fluent.framework.util.FluentUtil.*;
 import static com.fluent.framework.util.FluentToolkit.*;
 
@@ -47,11 +48,11 @@ public final class InEventDispatcher implements FluentService, Runnable{
     			
     }
 
-   
+    
     @Override
-    public final String name( ){
-    	return NAME;
-    }
+    public final FluentServiceType getServiceType( ){
+		return FluentServiceType.IN_DISPATCHER;
+	}
    
     
     public final int getBucketCapacity( ){

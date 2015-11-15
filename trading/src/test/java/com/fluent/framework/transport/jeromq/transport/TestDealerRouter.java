@@ -3,7 +3,7 @@ package com.fluent.framework.transport.jeromq.transport;
 import org.zeromq.ZContext;
 import org.zeromq.ZMsg;
 
-import com.fluent.framework.core.FluentService;
+import com.fluent.framework.core.FluentLifecycle;
 import com.fluent.framework.transport.jeromq.transport.ReliableDealerTransport;
 import com.fluent.framework.transport.jeromq.transport.ReliableRouterTransport;
 import com.fluent.framework.transport.jeromq.transport.ZListener;
@@ -12,7 +12,7 @@ import com.fluent.framework.transport.jeromq.transport.ZListener;
 public class TestDealerRouter{
 	
 	
-	private class TestRouter implements ZListener<ZMsg>, FluentService{
+	private class TestRouter implements ZListener<ZMsg>, FluentLifecycle{
 	
 		private final ReliableRouterTransport router;
 		
@@ -43,7 +43,7 @@ public class TestDealerRouter{
 	}
 	
 	
-	private class TestDealer implements ZListener<String>, FluentService{
+	private class TestDealer implements ZListener<String>, FluentLifecycle{
 		
 		private final ReliableDealerTransport dealer;
 		
