@@ -1,10 +1,10 @@
 package com.fluent.framework.market.adaptor;
 
-import com.fluent.framework.events.in.InEvent;
+import com.fluent.framework.events.in.*;
 
 
 public interface MarketDataListener{
-	
-	public void mdUpdate( InEvent inEvent );
+
+    public void mdUpdate( FluentInEvent inEvent );
 
 }

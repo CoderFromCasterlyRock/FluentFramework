@@ -11,58 +11,56 @@ import static com.fluent.framework.util.FluentUtil.*;
 
 public class DefaultDealerProtocol implements DealerProtocol{
 
-    private final String version;
+    private final String        version;
 
-    private final static String NAME        = DefaultDealerProtocol.class.getSimpleName();
-    private final static Logger LOGGER      = LoggerFactory.getLogger( NAME );
+    private final static String NAME   = DefaultDealerProtocol.class.getSimpleName( );
+    private final static Logger LOGGER = LoggerFactory.getLogger( NAME );
 
     public DefaultDealerProtocol( String version ){
         this.version = version;
     }
 
     @Override
-    public final String getVersion(){
+    public final String getVersion( ) {
         return version;
     }
 
 
     /**
-     * A connect command contains 3 frames
-     * Frame 0 : Empty
-     * Frame 1 : Protocol Version String
-     * Frame 2 : Byte value representing CONNECT
+     * A connect command contains 3 frames Frame 0 : Empty Frame 1 : Protocol Version String Frame 2
+     * : Byte value representing CONNECT
      */
     @Override
-    public final ZMsg connect(){
-        ZMsg message = new ZMsg();
+    public final ZMsg connect( ) {
+        ZMsg message = new ZMsg( );
 
         message.add( EMPTY_BYTE );
         message.add( version );
-        message.add( CONNECT.getData() );
+        message.add( CONNECT.getData( ) );
 
         return message;
     }
 
 
     @Override
-    public final ZMsg heartbeat(){
-        ZMsg message = new ZMsg();
+    public final ZMsg heartbeat( ) {
+        ZMsg message = new ZMsg( );
 
         message.add( EMPTY_BYTE );
         message.add( version );
-        message.add( HEARTBEAT.getData() );
+        message.add( HEARTBEAT.getData( ) );
 
         return message;
     }
 
 
     @Override
-    public final ZMsg marshall( final byte[] data ){
-        ZMsg message = new ZMsg();
+    public final ZMsg marshall( final byte[ ] data ) {
+        ZMsg message = new ZMsg( );
 
         message.add( EMPTY_BYTE );
         message.add( version );
-        message.add( PAYLOAD.getData() );
+        message.add( PAYLOAD.getData( ) );
         message.add( EMPTY_BYTE );
         message.add( data );
 
@@ -71,34 +69,34 @@ public class DefaultDealerProtocol implements DealerProtocol{
 
 
     @Override
-    public final MajordomoMessage unmarshall( final String identity, final ZMsg message ){
+    public final MajordomoMessage unmarshall( final String identity, final ZMsg message ) {
 
-        String version          = null;
-        MajordomoMessage msg    = null;
-        ZMessageType type       = ZMessageType.INVALID;
+        String version = null;
+        MajordomoMessage msg = null;
+        ZMessageType type = ZMessageType.INVALID;
 
         try{
 
-            @SuppressWarnings("unused")
-			ZFrame emnptyFrame  = message.pop();
-            ZFrame versionFrame = message.pop();
-            ZFrame typeFrame    = message.pop();
+            @SuppressWarnings( "unused" )
+            ZFrame emnptyFrame = message.pop( );
+            ZFrame versionFrame = message.pop( );
+            ZFrame typeFrame = message.pop( );
 
-            version             = new String( versionFrame.getData() );
-            type                = ZMessageType.getType( typeFrame );
-            byte[] dataBytes    = null;
+            version = new String( versionFrame.getData( ) );
+            type = ZMessageType.getType( typeFrame );
+            byte[ ] dataBytes = null;
 
             if( PAYLOAD == type ){
-                @SuppressWarnings("unused")
-                ZFrame envelope = message.pop();
-                dataBytes       = message.pop().getData();
+                @SuppressWarnings( "unused" )
+                ZFrame envelope = message.pop( );
+                dataBytes = message.pop( ).getData( );
             }
 
-            msg                 = new MajordomoMessage( identity, version, type, dataBytes );
-        
+            msg = new MajordomoMessage( identity, version, type, dataBytes );
+
         }catch( Exception e ){
             LOGGER.warn( "Exception while parsing message from [{}]", identity );
-            LOGGER.warn( "Exception:", e);
+            LOGGER.warn( "Exception:", e );
         }
 
         return msg;
@@ -106,12 +104,12 @@ public class DefaultDealerProtocol implements DealerProtocol{
     }
 
     @Override
-    public final ZMsg disconnect(){
-        ZMsg message = new ZMsg();
+    public final ZMsg disconnect( ) {
+        ZMsg message = new ZMsg( );
 
         message.add( EMPTY_BYTE );
         message.add( version );
-        message.add( DISCONNECT.getData() );
+        message.add( DISCONNECT.getData( ) );
 
         return message;
     }

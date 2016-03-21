@@ -1,100 +1,98 @@
 package com.fluent.framework.collection;
 
-import java.util.*;
-import java.util.concurrent.*;
+import uk.co.real_logic.agrona.concurrent.*;
 
-import org.jctools.queues.MpscArrayQueue;
+import java.util.concurrent.*;
 
 
 public final class MktDataDispatcher implements Runnable{
 
-    private volatile boolean keepDispatching;
-        
-    private final int queueSize;
-    private final ThreadPoolExecutor service;
-    private final MktDataListener[] listeners;
-    private final AbstractQueue<MktDataEvent> eventQueue;
+    private volatile boolean                                   keepDispatching;
+
+    private final int                                          queueSize;
+    private final ThreadPoolExecutor                           service;
+    private final MktDataListener[ ]                           listeners;
+    private final ManyToManyConcurrentArrayQueue<MktDataEvent> eventQueue;
 
 
     public MktDataDispatcher( int queueSize, MktDataListener ... listeners ){
-    	
-    	this.queueSize		= queueSize;
-        this.listeners       = listeners;
-        
-        this.eventQueue 	= new MpscArrayQueue<MktDataEvent>( queueSize );
-        this.service		= new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(2) );
-    
-    }
-    
 
-    public final void start( ){
+        this.queueSize = queueSize;
+        this.listeners = listeners;
+        this.eventQueue = new ManyToManyConcurrentArrayQueue<>( queueSize );
+        this.service = new ThreadPoolExecutor( 1, 1, 0L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>( 2 ) );
+
+    }
+
+
+    public final void start( ) {
         keepDispatching = true;
-        service.prestartCoreThread();
+        service.prestartCoreThread( );
         service.execute( this );
-        
+
     }
 
-    
-    protected final void warmUp( MktDataEvent event ){
-    	
-    	for( int i =0; i <(queueSize); i++ ){
-    	
-    		eventQueue.offer( event );
-    		
-    		while( !eventQueue.isEmpty() ){
-    			Thread.yield();
-    		}
-    	
-    	}
 
-    	eventQueue.clear();
-    	System.out.println("Finished warming up MktDataDispatcher, QUEUSize:  " + eventQueue.size() );
-    	
+    protected final void warmUp( MktDataEvent event ) {
+
+        for( int i = 0; i < (queueSize); i++ ){
+
+            eventQueue.offer( event );
+
+            while( !eventQueue.isEmpty( ) ){
+                Thread.yield( );
+            }
+
+        }
+
+        eventQueue.clear( );
+        System.out.println( "Finished warming up MktDataDispatcher, QUEUSize:  " + eventQueue.size( ) );
+
     }
-    
-    
-    public final boolean enqueue( final MktDataEvent event ){
+
+
+    public final boolean enqueue( final MktDataEvent event ) {
         return eventQueue.offer( event );
     }
 
-    
+
     @Override
-    public final void run( ){
+    public final void run( ) {
 
         while( keepDispatching ){
 
             try{
-            	
-                MktDataEvent event  = eventQueue.poll();
+
+                MktDataEvent event = eventQueue.poll( );
                 if( event == null ){
-                    Thread.yield();
+                    Thread.yield( );
                     continue;
                 }
 
                 for( MktDataListener listener : listeners ){
-                	listener.update( event );
+                    listener.update( event );
                 }
-                
+
             }catch( Exception e ){
-                e.printStackTrace( );                   
+                e.printStackTrace( );
             }
         }
-    
+
     }
 
-    
-    protected final int getQueueSize( ){
+
+    protected final int getQueueSize( ) {
         return eventQueue.size( );
     }
 
-    
-    public final void stop(){
+
+    public final void stop( ) {
         keepDispatching = false;
-        service.shutdown();
+        service.shutdown( );
     }
 
-    
-    
+
+
     public interface MktDataListener{
         public boolean update( MktDataEvent event );
     }

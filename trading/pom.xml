@@ -15,7 +15,24 @@
     </properties>
 
     <dependencies>
-
+    
+    	<dependency>
+    		<groupId>com.typesafe</groupId>
+    		<artifactId>config</artifactId>
+    		<version>1.0.2</version>
+		</dependency>
+    
+    	<dependency>
+            <groupId>com.eclipsesource.minimal-json</groupId>
+            <artifactId>minimal-json</artifactId>
+            <version>0.9.1</version>
+        </dependency>
+    
+     	<dependency>
+            <groupId>org.zeromq</groupId>
+            <artifactId>jeromq</artifactId>
+            <version>0.3.4</version>
+        </dependency>
 
 		<dependency>
 			<groupId>net.openhft</groupId>
@@ -29,18 +46,6 @@
 			</exclusions>
 		</dependency>
 		
-        <dependency>
-            <groupId>org.zeromq</groupId>
-            <artifactId>jeromq</artifactId>
-            <version>0.3.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.eclipsesource.minimal-json</groupId>
-            <artifactId>minimal-json</artifactId>
-            <version>0.9.1</version>
-        </dependency>
-
 
 		<dependency>
 			<groupId>uk.co.real-logic</groupId>
@@ -48,39 +53,26 @@
 			<version>0.4.7</version>
 		</dependency>
 
-
         <dependency>
             <groupId>com.github.stephenc.high-scale-lib</groupId>
             <artifactId>high-scale-lib</artifactId>
             <version>1.1.4</version>
         </dependency>
 
-		<dependency>
-  			<groupId>org.jctools</groupId>
-  			<artifactId>jctools-core</artifactId>
-  			<version>1.1</version>
-		</dependency>
-		
-		<dependency>
-    		<groupId>com.typesafe</groupId>
-    		<artifactId>config</artifactId>
-    		<version>1.0.2</version>
-		</dependency>
 
-		<!-- 
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>18.0</version>
-		</dependency>
- 		-->
- 
-    	<dependency>
 			<groupId>de.ruedigermoeller</groupId>
 			<artifactId>fst</artifactId>
 			<version>2.33</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>com.j256.simplejmx</groupId>
+			<artifactId>simplejmx</artifactId>
+			<version>1.12</version>
+		</dependency>
 
+ 
     	<dependency>
 			<groupId>org.hdrhistogram</groupId>
 			<artifactId>HdrHistogram</artifactId>
